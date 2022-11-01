@@ -4,7 +4,6 @@ use poise::{builtins::register_application_commands_buttons, Framework, Framewor
 use utils::read_config;
 
 mod config;
-mod data;
 mod utils;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
