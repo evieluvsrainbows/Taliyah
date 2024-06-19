@@ -17,18 +17,20 @@ so please keep an eye on this repository for any new features and updates, as we
 
 ### Prerequisites
 
-> NOTE: These prerequisites are currently out of date while the bot transitions to being based around poise and Discord's
-> new slash command system instead of serenity's old command framework.
+> [!CAUTION]
+> These prerequisites are currently out of date while the bot transitions to being based around poise and Discord's new
+> slash command system instead of serenity's old command framework; therefore these prerequisite instructions should not
+> be followed. I am also moving to a macOS-based workflow during the week of June 24, so when these instructions are updated,
+> they will be primarily based around macOS and the Homebrew package manager.
 
 Alright, before we can get Taliyah up and running, we'll need to install a couple pieces of software in order for Taliyah
 to actually build and run. This will depend on your operating system, be it either Windows, macOS or Linux. On Windows,
-this means you'll need Visual Studio 2019 installed, be it either the full IDE (Community, Professional, or Enterprise work
-fine) or just the Visual Studio 2019 Build Tools, and Rust itself. On macOS, you will need the Xcode Developer Tools, as
-it includes the system compiler (`clang`) necessary to build Rust programs and libraries, or you could also go with simply
-installing Rust through the `homebrew` tool. On Linux, you don't need to install anything in most cases, as most Linux
-distributions such as Ubuntu and Fedora already have the `gcc` toolchain installed, however if desired this can be switched
-to the same `clang` compiler as macOS by installing it through your respective package manager, or through `homebrew` as
-well.
+this means you'll need Visual Studio 2022 installed, be it either the full IDE (any edition works fine) or just the Visual
+Studio 2019 Build Tools, and Rust itself. On macOS, you will need the Xcode Developer Tools, as it includes the system
+compiler (`clang`) necessary to build Rust programs and libraries, or you could also go with simply installing Rust through
+the `homebrew` tool. On Linux, you don't need to install anything in most cases, as most Linux distributions such as Ubuntu
+and Fedora already have the `gcc` toolchain installed, however if desired this can be switched to the same `clang` compiler
+as macOS by installing it through your respective package manager, or through `homebrew` as well.
 
 Across *all* operating systems, however, you will need to install the PostgreSQL database server, version 13 or later, as
 that is required for the database. For the voice functionalities provided by Taliyah, you will need Opus, FFmpeg, `youtube-dl`,
@@ -40,7 +42,7 @@ ZERO support for these, as they are EOL and completely unsupported, even by the 
 
 All in all, you will need the following prerequisites for Taliyah to build and run:
 
-* Visual Studio 2019 / Visual Studio 2019 Build Tools (*Windows (non-WSL) only*)
+* Visual Studio 2022 / Visual Studio 2022 Build Tools (*Windows (non-WSL) only*)
 * PostgreSQL, version 13 or later
 * Opus 1.3.1 or later
 * FFmpeg 3.4.8 or later
