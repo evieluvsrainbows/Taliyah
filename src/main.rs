@@ -30,11 +30,11 @@ async fn main() -> Result<(), Error> {
             },
             ..Default::default()
         })
-        .token(token)
-        .intents(GatewayIntents::all())
-        .setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }));
+        .setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }))
+        .build();
 
-    framework.run().await.unwrap();
+    let client = serenity::Client::builder(token, GatewayIntents::all()).framework(framework).await;
+    client.unwrap().start().await.unwrap();
 
     Ok(())
 }
