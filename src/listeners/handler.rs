@@ -24,7 +24,7 @@ impl EventHandler for Handler {
         info!("Connected to the Discord API (version {api_version}) with {r_sessions}/{t_sessions} sessions remaining.");
         info!("Connected to and serving a total of {guild_count} guild(s).");
 
-        let presence = format!("on {guild_count} guilds | e.help");
+        let presence = format!("on {guild_count} guilds");
         context.set_presence(Some(ActivityData::playing(presence)), OnlineStatus::Online);
     }
 }
