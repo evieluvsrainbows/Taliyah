@@ -32,7 +32,7 @@ async fn main() -> Result<(), Error> {
         })
         .token(token)
         .intents(GatewayIntents::all())
-        .user_data_setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }));
+        .setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }));
 
     framework.run().await.unwrap();
 

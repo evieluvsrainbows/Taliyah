@@ -53,8 +53,7 @@ pub struct ApiConfig {
     pub entertainment: EntertainmentConfig,
     pub minecraft: MinecraftConfig,
     pub music: MusicConfig,
-    pub services: ServicesConfig,
-    pub social: SocialConfig
+    pub services: ServicesConfig
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -81,11 +80,6 @@ pub struct ServicesConfig {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct SocialConfig {
-    pub twitter: TwitterConfig
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SpotifyConfig {
     pub client_id: String,
     pub client_secret: String
@@ -101,25 +95,4 @@ pub struct LavalinkConfig {
     pub host: String,
     pub port: u16,
     pub password: String
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct TwitterConfig {
-    pub core: TwitterCore,
-    pub client: TwitterClient
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct TwitterCore {
-    pub api_key: String,
-    pub api_key_secret: String,
-    pub bearer_token: String,
-    pub access_token: String,
-    pub access_token_secret: String
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct TwitterClient {
-    pub client_id: String,
-    pub client_secret: String
 }
