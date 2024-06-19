@@ -19,8 +19,8 @@ so please keep an eye on this repository for any new features and updates, as we
 
 > [!CAUTION]
 > These prerequisites are currently out of date while the bot transitions to being based around poise and Discord's new
-> slash command system instead of serenity's old command framework; therefore these prerequisite instructions should not
-> be followed. I am also moving to a macOS-based workflow during the week of June 24, so when these instructions are updated,
+> slash command system instead of serenity's old command framework; therefore these instructions should not be followed.
+> I am also moving to a macOS-based workflow during the week of June 24, so when these instructions are updated,
 > they will be primarily based around macOS and the Homebrew package manager.
 
 Alright, before we can get Taliyah up and running, we'll need to install a couple pieces of software in order for Taliyah
