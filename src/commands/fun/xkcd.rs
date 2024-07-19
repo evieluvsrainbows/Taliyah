@@ -10,7 +10,7 @@ struct XkcdComic {
     num: u16,      // the numeric ID of the xkcd comic.
     alt: String,   // the caption of the xkcd comic.
     img: String,   // the image URL of the xkcd comic.
-    title: String, // the title of the xkcd comic.
+    title: String  // the title of the xkcd comic.
 }
 
 /// Retrieves the latest or a specific comic from xkcd.
@@ -18,7 +18,7 @@ struct XkcdComic {
 pub async fn xkcd(ctx: Context<'_>, #[description = "The specific comic no. to retrieve."] number: Option<u16>) -> Result<(), Error> {
     let comic = match number {
         None => "https://xkcd.com/info.0.json".to_string(),
-        Some(number) => format!("https://xkcd.com/{number}/info.0.json").to_string(),
+        Some(number) => format!("https://xkcd.com/{number}/info.0.json").to_string()
     };
 
     let client = ctx.serenity_context().data.read().await.get::<ReqwestContainer>().cloned().unwrap();

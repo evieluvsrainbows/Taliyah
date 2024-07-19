@@ -34,7 +34,7 @@ async fn main() -> Result<(), Error> {
             "warn" => Level::WARN,
             "info" => Level::INFO,
             "debug" => Level::DEBUG,
-            _ => Level::TRACE,
+            _ => Level::TRACE
         };
 
         let subscriber = FmtSubscriber::builder()
@@ -55,7 +55,7 @@ async fn main() -> Result<(), Error> {
                 commands::fun::xkcd::xkcd(),
                 commands::utilities::hello(),
                 commands::utilities::help(),
-                commands::utilities::source()
+                commands::utilities::source(),
             ],
             ..Default::default()
         })

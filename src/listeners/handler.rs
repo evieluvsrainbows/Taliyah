@@ -1,6 +1,6 @@
 use serenity::{
     all::{ActivityData, Context, EventHandler, OnlineStatus, Ready},
-    async_trait,
+    async_trait
 };
 use tracing::info;
 
