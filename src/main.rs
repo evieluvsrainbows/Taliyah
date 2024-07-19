@@ -20,7 +20,7 @@ type Error = anyhow::Error;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 struct Data {
-    reqwest_container: Client,
+    reqwest_container: Client
 }
 
 #[tokio::main(worker_threads = 16)]
