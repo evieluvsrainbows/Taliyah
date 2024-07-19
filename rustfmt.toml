@@ -2,7 +2,7 @@
 unstable_features = true
 
 # Width formatting options
-max_width = 188
+max_width = 190
 
 # General formatting options
 trailing_comma = "Never"

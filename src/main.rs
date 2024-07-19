@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 mod commands;
 mod config;
 mod constants;
@@ -61,11 +63,11 @@ async fn main() -> Result<(), Error> {
             ],
             ..Default::default()
         })
-        .setup(move |ctx, _ready, framework| {
+        .setup(move |context, _ready, framework| {
             Box::pin(async move {
                 // register all commands upon startup to avoid having to register them
                 // manually.
-                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                poise::builtins::register_globally(context, &framework.options().commands).await?;
                 Ok(Data {
                     config: read_config("config.toml"),
                     reqwest_container: Client::builder().user_agent(REQWEST_USER_AGENT).redirect(Policy::none()).build()?

@@ -14,16 +14,16 @@ struct XkcdComic {
 
 /// Retrieves the latest or a specific comic from xkcd.
 #[command(slash_command)]
-pub async fn xkcd(ctx: Context<'_>, #[description = "The specific comic no. to retrieve."] number: Option<u16>) -> Result<(), Error> {
+pub async fn xkcd(context: Context<'_>, #[description = "The specific comic no. to retrieve."] number: Option<u16>) -> Result<(), Error> {
     let comic = match number {
         None => "https://xkcd.com/info.0.json",
         Some(number) => &format!("https://xkcd.com/{number}/info.0.json")
     };
 
-    let client = &ctx.data().reqwest_container;
+    let client = &context.data().reqwest_container;
     let request = client.get(comic).send().await?;
     if request.status() == StatusCode::NOT_FOUND {
-        ctx.reply("You did not provide a valid comic id.").await?;
+        context.reply("You did not provide a valid comic id.").await?;
         return Ok(());
     }
 
@@ -40,7 +40,7 @@ pub async fn xkcd(ctx: Context<'_>, #[description = "The specific comic no. to r
         .footer(CreateEmbedFooter::new(format!("xkcd comic no. {num}")));
 
     let links = CreateActionRow::Buttons(vec![CreateButton::new_link(page).label("View on xkcd"), CreateButton::new_link(wiki).label("View wiki")]);
-    ctx.send(poise::CreateReply::default().embed(embed).components(vec![links])).await?;
+    context.send(poise::CreateReply::default().embed(embed).components(vec![links])).await?;
 
     Ok(())
 }
