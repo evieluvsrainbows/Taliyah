@@ -1,9 +1,8 @@
+use crate::{Context, Error};
 use poise::command;
 use reqwest::StatusCode;
 use serde::Deserialize;
 use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter};
-
-use crate::{data::ReqwestContainer, Context, Error};
 
 #[derive(Debug, Deserialize)]
 struct XkcdComic {
@@ -17,11 +16,11 @@ struct XkcdComic {
 #[command(slash_command)]
 pub async fn xkcd(ctx: Context<'_>, #[description = "The specific comic no. to retrieve."] number: Option<u16>) -> Result<(), Error> {
     let comic = match number {
-        None => "https://xkcd.com/info.0.json".to_string(),
-        Some(number) => format!("https://xkcd.com/{number}/info.0.json").to_string()
+        None => "https://xkcd.com/info.0.json",
+        Some(number) => &format!("https://xkcd.com/{number}/info.0.json")
     };
 
-    let client = ctx.serenity_context().data.read().await.get::<ReqwestContainer>().cloned().unwrap();
+    let client = &ctx.data().reqwest_container;
     let request = client.get(comic).send().await?;
     if request.status() == StatusCode::NOT_FOUND {
         ctx.reply("You did not provide a valid comic id.").await?;

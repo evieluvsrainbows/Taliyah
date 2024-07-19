@@ -1,6 +1,5 @@
 use crate::serenity::GatewayIntents;
 use constants::REQWEST_USER_AGENT;
-use data::ReqwestContainer;
 use listeners::handler::Handler;
 use poise::serenity_prelude as serenity;
 use poise::{Framework, FrameworkOptions};
@@ -14,14 +13,15 @@ use utils::read_config;
 mod commands;
 mod config;
 mod constants;
-mod data;
 mod listeners;
 mod utils;
 
 type Error = anyhow::Error;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
-struct Data {}
+struct Data {
+    reqwest_container: Client,
+}
 
 #[tokio::main(worker_threads = 16)]
 async fn main() -> Result<(), Error> {
@@ -64,7 +64,9 @@ async fn main() -> Result<(), Error> {
                 // register all commands upon startup to avoid having to register them
                 // manually.
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data {
+                    reqwest_container: Client::builder().user_agent(REQWEST_USER_AGENT).redirect(Policy::none()).build()?
+                })
             })
         })
         .build();
@@ -74,12 +76,6 @@ async fn main() -> Result<(), Error> {
     info!("Initialized {} commands: {}", command_count, commands_str);
 
     let mut client = serenity::Client::builder(token, GatewayIntents::all()).event_handler(Handler).framework(framework).await?;
-
-    {
-        let mut data = client.data.write().await;
-        let http = Client::builder().user_agent(REQWEST_USER_AGENT).redirect(Policy::none()).build()?;
-        data.insert::<ReqwestContainer>(http);
-    }
 
     if let Err(why) = client.start_autosharded().await {
         eprintln!("An error occurred while running the client: {why:?}");
