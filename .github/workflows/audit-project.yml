@@ -6,6 +6,7 @@ on:
       - '**/Cargo.lock'
 jobs:
   security_audit:
+    name: Run security audit
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
