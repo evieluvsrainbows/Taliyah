@@ -1,25 +1,26 @@
-use crate::serenity::GatewayIntents;
+mod commands;
+mod config;
+mod constants;
+mod listeners;
+mod models;
+mod utils;
+
+use config::ConfigurationData;
 use constants::REQWEST_USER_AGENT;
 use listeners::handler::Handler;
-use poise::serenity_prelude as serenity;
-use poise::{Framework, FrameworkOptions};
-use reqwest::redirect::Policy;
-use reqwest::Client;
+use poise::{serenity_prelude as serenity, Framework, FrameworkOptions};
+use reqwest::{redirect::Policy, Client};
+use serenity::GatewayIntents;
 use tracing::{info, Level};
 use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 use utils::read_config;
 
-mod commands;
-mod config;
-mod constants;
-mod listeners;
-mod utils;
-
 type Error = anyhow::Error;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 struct Data {
+    config: ConfigurationData,
     reqwest_container: Client
 }
 
@@ -53,6 +54,7 @@ async fn main() -> Result<(), Error> {
         .options(FrameworkOptions {
             commands: vec![
                 commands::fun::xkcd::xkcd(),
+                commands::search::tmdb::tmdb(),
                 commands::utilities::hello(),
                 commands::utilities::help(),
                 commands::utilities::source(),
@@ -65,6 +67,7 @@ async fn main() -> Result<(), Error> {
                 // manually.
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
+                    config: read_config("config.toml"),
                     reqwest_container: Client::builder().user_agent(REQWEST_USER_AGENT).redirect(Policy::none()).build()?
                 })
             })
@@ -76,7 +79,6 @@ async fn main() -> Result<(), Error> {
     info!("Initialized {} commands: {}", command_count, commands_str);
 
     let mut client = serenity::Client::builder(token, GatewayIntents::all()).event_handler(Handler).framework(framework).await?;
-
     if let Err(why) = client.start_autosharded().await {
         eprintln!("An error occurred while running the client: {why:?}");
     }

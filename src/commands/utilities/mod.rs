@@ -1,6 +1,5 @@
-use poise::command;
-
 use crate::{Context, Error};
+use poise::command;
 
 /// Shows the help menu.
 #[command(slash_command, track_edits)]

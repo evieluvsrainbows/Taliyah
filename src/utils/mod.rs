@@ -1,6 +1,5 @@
-use std::{fs::File, io::Read};
-
 use crate::config::ConfigurationData;
+use std::{fs::File, io::Read};
 
 pub fn read_config(file: &str) -> ConfigurationData {
     let mut file = File::open(file).unwrap();
