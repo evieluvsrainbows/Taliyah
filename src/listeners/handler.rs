@@ -1,4 +1,7 @@
-use serenity::{all::{ActivityData, Context, EventHandler, OnlineStatus, Ready}, async_trait};
+use serenity::{
+    all::{ActivityData, Context, EventHandler, OnlineStatus, Ready},
+    async_trait,
+};
 use tracing::info;
 
 pub struct Handler;
@@ -15,9 +18,8 @@ impl EventHandler for Handler {
         let r_sessions = bot_gateway.session_start_limit.remaining;
 
         info!("Successfully logged into Discord as the following user:");
-        info!("Bot username: {}", ready.user.tag());
-        info!("Bot user ID: {}", ready.user.id);
-        info!("Bot owner: {}", bot_owner.tag());
+        info!("Bot details: {} (User ID: {})", ready.user.tag(), ready.user.id);
+        info!("Bot owner: {} (User ID: {})", bot_owner.tag(), bot_owner.id.to_string());
 
         let guild_count = ready.guilds.len();
 

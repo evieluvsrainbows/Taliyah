@@ -1,26 +1,21 @@
 use crate::serenity::GatewayIntents;
 use listeners::handler::Handler;
 use poise::serenity_prelude as serenity;
-use poise::{builtins::register_application_commands_buttons, Framework, FrameworkOptions, PrefixFrameworkOptions};
+use poise::{Framework, FrameworkOptions};
 use tracing::{info, Level};
 use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 use utils::read_config;
 
+mod commands;
 mod config;
 mod listeners;
 mod utils;
 
-type Error = Box<dyn std::error::Error + Send + Sync>;
+type Error = anyhow::Error;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 struct Data {}
-
-#[poise::command(prefix_command, owners_only)]
-async fn register(ctx: Context<'_>) -> Result<(), Error> {
-    register_application_commands_buttons(ctx).await?;
-    Ok(())
-}
 
 #[tokio::main(worker_threads = 16)]
 async fn main() -> Result<(), Error> {
@@ -50,15 +45,22 @@ async fn main() -> Result<(), Error> {
     let token = configuration.bot.discord.token;
     let framework = Framework::builder()
         .options(FrameworkOptions {
-            commands: vec![register()],
-            prefix_options: PrefixFrameworkOptions {
-                prefix: Some(configuration.bot.general.prefix),
-                ..Default::default()
-            },
+            commands: vec![commands::utilities::hello(), commands::utilities::help(), commands::utilities::source()],
             ..Default::default()
         })
-        .setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }))
+        .setup(move |ctx, _ready, framework| {
+            Box::pin(async move {
+                // register all commands upon startup to avoid having to register them
+                // manually.
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                Ok(Data {})
+            })
+        })
         .build();
+
+    let command_count = &framework.options().commands.len();
+    let commands_str: String = framework.options().commands.iter().map(|c| &c.name).cloned().collect::<Vec<String>>().join(", ");
+    info!("Initialized {} commands: {}", command_count, commands_str);
 
     let client = serenity::Client::builder(token, GatewayIntents::all()).event_handler(Handler).framework(framework).await;
     client.unwrap().start().await.unwrap();
