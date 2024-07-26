@@ -90,7 +90,7 @@ pub async fn collection(context: Context<'_>, #[description = "The name of the c
 
 /// Retrieves detailed information about a film from TMDb.
 #[poise::command(slash_command)]
-pub async fn movie(context: Context<'_>, #[description = "The film name."] name: String, #[description = "The film release year."] year: Option<u16>) -> Result<(), Error> {
+pub async fn movie(context: Context<'_>, #[description = "Film name"] name: String, #[description = "Film release year"] year: Option<u16>) -> Result<(), Error> {
     let data = &context.data();
     let api_key = &data.config.api.entertainment.tmdb;
     let client = &data.reqwest_container;
@@ -147,12 +147,12 @@ pub async fn movie(context: Context<'_>, #[description = "The film name."] name:
     let homepage = match result.homepage {
         Some(homepage) => {
             if homepage.is_empty() {
-                "No Website".to_string()
+                "No Website"
             } else {
-                format!("[Website]({homepage})")
+                &format!("[Website]({homepage})")
             }
         }
-        None => "No Website".to_string()
+        None => "No Website"
     };
 
     let id = result.id.to_string();
