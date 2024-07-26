@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2019-present Evelyn Marie.
+Copyright (c) 2019-present Evelyn Harthbrooke
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
