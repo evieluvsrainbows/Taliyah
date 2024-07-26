@@ -38,8 +38,8 @@ desired this can be switched to the same `clang` compiler as macOS by installing
 or through `homebrew` or MacPorts as previously mentioned.
 
 You will also need Git, in order to be able to clone this repository to your system. Git can be downloaded either from the
-Git website located [here](https://git-scm.com/download/win) if you're on Windows, the package manager provided by your distribution
-of choice, or, on macOS, with `homebrew` or MacPorts.
+Git website (located [here](https://git-scm.com/download/win) if you're on Windows), the package manager provided by your
+distribution of choice, or, on macOS, with `homebrew` or MacPorts.
 
 All in all, you will need the following prerequisites for Taliyah to build and run:
 
