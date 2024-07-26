@@ -19,6 +19,7 @@ humantime           = "2.1.0"
 itertools           = "0.13.0"
 lastfm-rs           = "0.5.0"
 poise               = "0.6.1"
+rand                = "0.8.5"
 reqwest             = { version = "0.12.5", default-features = false, features = ["json", "multipart", "stream", "rustls-tls"]}
 rspotify            = "0.13.2"
 serenity            = "0.12.2"
