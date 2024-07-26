@@ -23,6 +23,9 @@ so please keep an eye on this repository for any new features and updates, as we
 
 ## Installation
 
+> [!NOTE]
+> Installation instructions do not exist for macOS and Linux yet. They will be added soon.
+
 ### Prerequisites
 
 Before we can get Taliyah up and running, we'll need to install a couple pieces of software in order for Taliyah to actually
@@ -80,14 +83,11 @@ When GCC and the other build tools are installed, run the following command to i
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-##### Advanced Notes
-
-To install `rustup`, `rustc`, and `cargo` to a different install location, create both the `RUSTUP_HOME` and `CARGO_HOME`
-system environment variables under the System Properties window in Windows, under Advanced. The `rustup` tool does not currently
-offer a user-friendly way of changing the instal location, but this is an option if you would like to install Rust to a different
-drive or folder.
-
-> **TODO**: Add install instructions for macOS and Linux.
+> [!TIP]
+> To install `rustup`, `rustc`, and `cargo` to a different install location, create both the `RUSTUP_HOME` and `CARGO_HOME`
+> system environment variables under the System Properties window in Windows, under Advanced. The `rustup` tool does not
+> currently offer a user-friendly way of changing the instal location, but this is an option if you would like to install
+> Rust to a different drive or folder.
 
 ### Installing the Bot
 
