@@ -69,10 +69,11 @@ run the tool and follow the instructions to install Rust on your system.
 > is likely out of date compared to what the current version of Rust actually is (1.79.0 at the time of writing); therefore
 > rustup should be used instead.
 
-Installing Rust in Windows Subsystem for Linux is even easier, and doesn't require Visual Studio 2022 or the Build
-Tools. It should be noted as well that these instructions also apply to machines running
+Installing Rust inside of Windows Subsystem for Linux is even easier and doesn't require Visual Studio 2022 or the Build
+Tools. It should be noted as well that these instructions also apply to machines running Linux natively, as WSL is just a
+virtual machine that has been tightly integrated into Windows.
 
-First, as not all distributions include GCC by default, you will want to install GCC via your Linux distribution's package
+First, as not all distributions include GCC by default, you will need to install GCC via your Linux distribution's package
 manager. As there are multiple Linux distributions as well as multiple package managers on said distributions, instructions
 cannot be provided. I recommend looking up how to install your respective distribution's build tools metapackage, which includes
 GCC as well as other tools useful for development.
