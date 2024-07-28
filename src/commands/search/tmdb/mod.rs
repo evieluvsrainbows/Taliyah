@@ -70,11 +70,11 @@ pub async fn collection(context: Context<'_>, #[description = "The name of the c
     parts.sort_by_cached_key(|p| p.id);
 
     #[rustfmt::skip]
-    let rows: Vec<CreateActionRow> = parts.chunks(5).map(|c| CreateActionRow::Buttons(c.iter().map(|p| {
-        let id = &p.id;
-        let title = &p.title;
-        let summary = &p.overview;
-        let release_date = match &NaiveDate::parse_from_str(&p.release_date, "%Y-%m-%d") {
+    let rows: Vec<CreateActionRow> = parts.chunks(5).map(|car| CreateActionRow::Buttons(car.iter().map(|part| {
+        let id = &part.id;
+        let title = &part.title;
+        let summary = &part.overview;
+        let release_date = match &NaiveDate::parse_from_str(&part.release_date, "%Y-%m-%d") {
             Ok(date) => date.format("%B %-e, %Y").to_string(),
             Err(_) => "Unreleased".to_string(),
         };
@@ -112,67 +112,41 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
     let response = client.get(&endpoint).query(&[("api_key", &api_key)]).send().await?;
     let result: Movie = response.json().await?;
 
-    let tagline = match result.tagline {
-        Some(tagline) => {
-            if tagline.is_empty() {
-                String::new()
-            } else {
-                format!("*{tagline}*")
-            }
-        }
-        None => String::new()
-    };
-
-    let overview = match result.overview {
-        Some(overview) => {
-            if !tagline.is_empty() {
-                format!("\n\n{overview}")
-            } else {
-                overview
-            }
-        }
-        None => String::new()
-    };
-
-    let studios = if result.production_companies.is_empty() {
-        "No Known Studios".to_string()
-    } else {
-        result.production_companies.iter().map(|c| &c.name).join("\n")
-    };
-
-    let collection = match result.belongs_to_collection {
-        Some(collection) => collection.name,
-        None => "N/A".to_string()
-    };
-
-    let homepage = match result.homepage {
-        Some(homepage) => {
-            if homepage.is_empty() {
-                "No Website"
-            } else {
-                &format!("[Website]({homepage})")
-            }
-        }
-        None => "No Website"
-    };
-
     let id = result.id.to_string();
-    let title = result.title.as_str();
     let status = result.status;
+    let title = result.title.as_str();
+    let tagline = result.tagline.filter(|t| !t.is_empty()).map(|t| format!("*{t}*")).unwrap_or_default();
+    let overview = result.overview.map(|ow| if !tagline.is_empty() { format!("\n\n{ow}") } else { ow }).unwrap_or_default();
+    let homepage = result.homepage.filter(|h| !h.is_empty()).map(|h| format!("[Website]({h})")).unwrap_or("No Website".to_string());
+    let collection = result.collection.map(|c| c.name).unwrap_or("N/A".to_string());
+    let studios = result.production_companies.iter().map(|c| &c.name).join("\n");
     let language = locale::get_language_name_from_iso(&result.original_language).to_string();
     let release_date = result.release_date.unwrap().format("%B %e, %Y").to_string();
-    let budget = format_int(result.budget);
-    let revenue = format_int(result.revenue);
+    let budget = format!("${}", format_int(result.budget));
+    let revenue = format!("${}", format_int(result.revenue));
     let imdb = format!("[IMDb](https://www.imdb.com/title/{})", result.imdb_id.unwrap());
     let url = format!("https://www.themoviedb.org/movie/{id}");
     let genres = result.genres.iter().map(|g| &g.name).join("\n");
-    let popularity = format!("{}%", result.popularity.round());
     let poster_uri = result.poster_path.unwrap();
     let poster = format!("https://image.tmdb.org/t/p/original/{}", &poster_uri.replace('/', ""));
-    let user_score = format!("{}/100", (result.vote_average * 10.0).round());
     let user_score_count = result.vote_count;
+    let user_score = format!("{}% ({} votes)", (result.vote_average * 10.0).round(), user_score_count);
     let runtime = format_duration(Duration::from_secs(result.runtime.unwrap() * 60)).to_string();
     let external_links = format!("{homepage} | {imdb}");
+
+    let mut fields = vec![];
+    fields.push(("Status", &*status, true));
+    fields.push(("Film ID", &*id, true));
+    fields.push(("Language", &*language, true));
+    fields.push(("Runtime", &*runtime, true));
+    fields.push(("Release Date", &*release_date, true));
+    fields.push(("Collection", &*collection, true));
+    fields.push(("User Score", &*user_score, true));
+    fields.push(("Box Office", &*revenue, true));
+    fields.push(("Budget", &*budget, true));
+    fields.push(("Genres", &*genres, true));
+    fields.push(("Studios", if !&studios.is_empty() { &*studios } else { "No Known Studios" }, true));
+    fields.push(("External Links", &*external_links, true));
 
     let embed = CreateEmbed::new()
         .title(title)
@@ -180,22 +154,8 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
         .color(0x01b4e4)
         .thumbnail(poster)
         .description(format!("{tagline}{overview}"))
-        .fields(vec![
-            ("Status", status, true),
-            ("Film ID", id, true),
-            ("Language", language, true),
-            ("Runtime", runtime, true),
-            ("Release Date", release_date, true),
-            ("Collection", collection, true),
-            ("Popularity", popularity, true),
-            ("User Score", format!("{user_score} ({user_score_count} votes)"), true),
-            ("Budget", format!("${budget}"), true),
-            ("Box Office", format!("${revenue}"), true),
-            ("Genres", genres, true),
-            ("Studios", studios, true),
-            ("External Links", external_links, false),
-        ])
-        .footer(CreateEmbedFooter::new("Powered by the The Movie Database API."));
+        .fields(fields)
+        .footer(CreateEmbedFooter::new("Powered by TMDb."));
 
     context.send(CreateReply::default().embed(embed)).await?;
 
