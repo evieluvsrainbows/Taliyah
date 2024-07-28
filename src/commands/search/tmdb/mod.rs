@@ -30,13 +30,13 @@ pub struct Collection {
     pub parts: Vec<SimplifiedMovie>             // The movies part of the collection.
 }
 
-/// Commands for interacting with The Movie Database (tmdb.org).
+/// Commands for interacting with The Movie Database (themoviedb.org).
 #[poise::command(slash_command, subcommands("collection", "movie"))]
 pub async fn tmdb(_context: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-/// Retrieves information about a collection on TMDb.
+/// Retrieves detailed information about a given collection.
 #[poise::command(slash_command)]
 pub async fn collection(context: Context<'_>, #[description = "The name of the collection."] name: String) -> Result<(), Error> {
     let data = &context.data();
@@ -82,7 +82,7 @@ pub async fn collection(context: Context<'_>, #[description = "The name of the c
     Ok(())
 }
 
-/// Retrieves detailed information about a film from TMDb.
+/// Retrieves detailed information about a given film.
 #[poise::command(slash_command)]
 pub async fn movie(context: Context<'_>, #[description = "Film name"] name: String, #[description = "Film release year"] year: Option<u16>) -> Result<(), Error> {
     let data = &context.data();
