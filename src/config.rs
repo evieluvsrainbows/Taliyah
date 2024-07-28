@@ -1,98 +1,77 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct ConfigurationData {
     pub bot: BotConfig,
     pub api: ApiConfig
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct BotConfig {
     pub general: GeneralConfig,
-    pub database: DatabaseConfig,
     pub discord: DiscordConfig,
     pub denylist: DenylistConfig,
     pub logging: LoggingConfig
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct GeneralConfig {
     pub codename: String,
-    pub prefix: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct LoggingConfig {
     pub enabled: bool,
     pub level: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
-pub struct DatabaseConfig {
-    pub url: String
-}
-
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct DiscordConfig {
     pub appid: u64,
     pub token: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct DenylistConfig {
     pub spotify: DenylistSpotifyConfig
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct DenylistSpotifyConfig {
     pub ids: Vec<u64>
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct ApiConfig {
     pub entertainment: EntertainmentConfig,
-    pub minecraft: MinecraftConfig,
     pub music: MusicConfig,
     pub services: ServicesConfig
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct EntertainmentConfig {
     pub tmdb: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MinecraftConfig {
-    pub hypixel: String
-}
-
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct MusicConfig {
     pub spotify: SpotifyConfig,
     pub lastfm: LastFmConfig,
-    pub lavalink: LavalinkConfig
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct ServicesConfig {
     pub github: String,
     pub google: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct SpotifyConfig {
     pub client_id: String,
     pub client_secret: String
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct LastFmConfig {
     pub api_key: String
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct LavalinkConfig {
-    pub host: String,
-    pub port: u16,
-    pub password: String
 }

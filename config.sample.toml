@@ -2,10 +2,6 @@
 
     [bot.general]
     codename = "Carbon"
-    prefix = ""
-
-    [bot.database]
-    url = ""
 
     [bot.discord]
     appid = "" # replace with unquoted integer
@@ -14,7 +10,7 @@
     [bot.denylist]
         # Users unable to be parsed by the Spotify status / now playing command.
         #
-        # Anyone who is in the deny list cannot have their current Spotify status checked
+        # Anyone in the denylist cannot have their current Spotify status checked
         # by the bot.
         [bot.denylist.spotify]
         ids = [ ]
@@ -34,29 +30,8 @@
         [api.music.lastfm]
         api_key = ""
 
-        [api.music.lavalink]
-        host = ""
-        port = 1000
-        password = ""
-
     [api.entertainment]
     tmdb = ""
-
-    [api.minecraft]
-    hypixel = ""
-
-    [api.social]
-
-        [api.social.twitter.core]
-        api_key = ""
-        api_key_secret = ""
-        bearer_token = ""
-        access_token = ""
-        access_token_secret = ""
-
-        [api.social.twitter.client]
-        client_id = ""
-        client_secret = ""
 
     [api.services]
     github = ""
