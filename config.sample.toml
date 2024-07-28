@@ -8,10 +8,8 @@
     token = ""
 
     [bot.denylist]
-        # Users unable to be parsed by the Spotify status / now playing command.
-        #
-        # Anyone in the denylist cannot have their current Spotify status checked
-        # by the bot.
+        # The denylist for the Spotify commands. Anyone who is in this list
+        # are unable to have their now playing status checked and/or retrieved.
         [bot.denylist.spotify]
         ids = [ ]
 
