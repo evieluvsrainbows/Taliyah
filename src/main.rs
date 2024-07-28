@@ -65,8 +65,6 @@ async fn main() -> Result<(), Error> {
         })
         .setup(move |context, _ready, framework| {
             Box::pin(async move {
-                // register all commands upon startup to avoid having to register them
-                // manually.
                 poise::builtins::register_globally(context, &framework.options().commands).await?;
                 Ok(Data {
                     config: read_config("config.toml"),

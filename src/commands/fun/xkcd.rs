@@ -1,5 +1,4 @@
 use crate::{Context, Error};
-use poise::command;
 use rand::Rng;
 use reqwest::StatusCode;
 use serde::Deserialize;
@@ -14,7 +13,7 @@ struct XkcdComic {
 }
 
 /// Retrieves the latest or a specific comic from xkcd.
-#[command(slash_command)]
+#[poise::command(slash_command)]
 pub async fn xkcd(
     context: Context<'_>,
     #[description = "Retrieve a specific comic."] number: Option<u16>,
@@ -27,16 +26,11 @@ pub async fn xkcd(
         return Ok(());
     }
 
-    // there is likely a way to make this code cleaner, but this code works
-    // for now until when or if a better solution is discovered.
     let comic = match number {
         None => {
             if random {
-                // update this whenever xkcd pushes new comics.
-                let xkcd_range = {
-                    let mut rng = rand::thread_rng();
-                    rng.gen_range(1..2963)
-                };
+                let mut rng = rand::thread_rng();
+                let xkcd_range = rng.gen_range(1..2964);
                 &format!("https://xkcd.com/{xkcd_range}/info.0.json")
             } else {
                 "https://xkcd.com/info.0.json"
