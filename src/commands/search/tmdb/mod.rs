@@ -104,6 +104,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
     let results = result.results;
     if results.is_empty() {
         context.say(format!("No results found for `{name}`. Please try looking for another movie.")).await?;
+        return Ok(());
     }
 
     let id = results.first().unwrap().id;
