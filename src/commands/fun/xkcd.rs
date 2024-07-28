@@ -1,16 +1,7 @@
-use crate::{Context, Error};
+use crate::{models::Comic, Context, Error};
 use rand::Rng;
 use reqwest::StatusCode;
-use serde::Deserialize;
 use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter};
-
-#[derive(Deserialize)]
-struct Comic {
-    num: u16,      // the numeric ID of the xkcd comic.
-    alt: String,   // the caption of the xkcd comic.
-    img: String,   // the image URL of the xkcd comic.
-    title: String  // the title of the xkcd comic.
-}
 
 /// Retrieves the latest or a specific comic from xkcd.
 #[poise::command(slash_command)]
