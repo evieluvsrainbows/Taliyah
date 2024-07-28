@@ -1,5 +1,5 @@
 use crate::{
-    models::tmdb::Movie,
+    models::tmdb::{Movie, SimplifiedMovie},
     utils::{format_int, locale},
     Context, Error
 };
@@ -22,21 +22,15 @@ pub struct SearchResult {
 }
 
 #[derive(Deserialize, Debug)]
+#[rustfmt::skip]
 pub struct Collection {
-    pub name: String,                // The name of the collection.
-    pub overview: String,            // The overview of the collection.
-    pub poster_path: String,         // The poster belonging to the collection.
-    pub parts: Vec<SimplifiedMovie>  // The movies part of the collection.
+    pub name: String,                           // The name of the collection.
+    pub overview: String,                       // The overview of the collection.
+    pub poster_path: String,                    // The poster belonging to the collection.
+    pub parts: Vec<SimplifiedMovie>             // The movies part of the collection.
 }
 
-#[derive(Deserialize, Debug)]
-pub struct SimplifiedMovie {
-    pub id: u64,              // The TMDb ID belonging to the movie.
-    pub overview: String,     // The overview of the movie.
-    pub release_date: String, // The release date of the movie.
-    pub title: String         // The title of the movie.
-}
-
+/// Commands for interacting with The Movie Database (tmdb.org).
 #[poise::command(slash_command, subcommands("collection", "movie"))]
 pub async fn tmdb(_context: Context<'_>) -> Result<(), Error> {
     Ok(())

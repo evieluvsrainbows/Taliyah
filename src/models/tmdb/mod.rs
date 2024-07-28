@@ -31,6 +31,15 @@ pub struct Movie {
     pub vote_count: f64                               // The movie's total amount of votes on The Movie Database.
 }
 
+#[derive(Deserialize, Debug)]
+#[rustfmt::skip]
+pub struct SimplifiedMovie {
+    pub id: u64,                                      // The TMDb ID belonging to the movie.
+    pub overview: String,                             // The overview of the movie.
+    pub release_date: String,                         // The release date of the movie.
+    pub title: String                                 // The title of the movie.
+}
+
 #[derive(Deserialize)]
 #[rustfmt::skip]
 pub struct Collection {
