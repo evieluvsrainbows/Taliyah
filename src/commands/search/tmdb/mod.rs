@@ -11,17 +11,17 @@ use serde::Deserialize;
 use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter};
 use std::time::Duration;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 pub struct SearchResponse {
     pub results: Vec<SearchResult>
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 pub struct SearchResult {
     pub id: u64
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 #[rustfmt::skip]
 pub struct Collection {
     pub name: String,                           // The name of the collection.
