@@ -128,7 +128,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
     let runtime = format_duration(Duration::from_secs(result.runtime.unwrap() * 60)).to_string();
     let external_links = format!("{homepage} | {imdb}");
 
-    let mut fields = vec![];
+    let mut fields = Vec::with_capacity(12);
     fields.push(("Status", &*status, true));
     fields.push(("Film ID", &*id, true));
     fields.push(("Language", &*language, true));
