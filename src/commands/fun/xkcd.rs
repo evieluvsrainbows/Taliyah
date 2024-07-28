@@ -4,8 +4,8 @@ use reqwest::StatusCode;
 use serde::Deserialize;
 use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter};
 
-#[derive(Debug, Deserialize)]
-struct XkcdComic {
+#[derive(Deserialize)]
+struct Comic {
     num: u16,      // the numeric ID of the xkcd comic.
     alt: String,   // the caption of the xkcd comic.
     img: String,   // the image URL of the xkcd comic.
@@ -19,7 +19,7 @@ pub async fn xkcd(context: Context<'_>, #[description = "Gets a specific comic."
     let comic = match number {
         None if random.unwrap_or_default() => {
             let request = client.get("https://xkcd.com/info.0.json").send().await?;
-            let id = request.json::<XkcdComic>().await?.num;
+            let id = request.json::<Comic>().await?.num;
             let mut rng = rand::thread_rng();
             let range = loop {
                 let num = rng.gen_range(1..id);
@@ -43,7 +43,7 @@ pub async fn xkcd(context: Context<'_>, #[description = "Gets a specific comic."
         return Ok(());
     }
 
-    let response: XkcdComic = request.json().await?;
+    let response: Comic = request.json().await?;
     let num = response.num;
     let page = format!("https://xkcd.com/{num}/");
     let wiki = format!("https://explainxkcd.com/wiki/index.php/{num}");
