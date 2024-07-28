@@ -16,7 +16,7 @@ pub struct BotConfig {
 
 #[derive(Deserialize)]
 pub struct GeneralConfig {
-    pub codename: String,
+    pub codename: String
 }
 
 #[derive(Deserialize)]
@@ -56,7 +56,7 @@ pub struct EntertainmentConfig {
 #[derive(Deserialize)]
 pub struct MusicConfig {
     pub spotify: SpotifyConfig,
-    pub lastfm: LastFmConfig,
+    pub lastfm: LastFmConfig
 }
 
 #[derive(Deserialize)]
