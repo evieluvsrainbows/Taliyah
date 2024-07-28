@@ -108,7 +108,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
 
     let id = result.id.to_string();
     let status = result.status;
-    let title = result.title.as_str();
+    let title = result.title;
     let tagline = result.tagline.filter(|t| !t.is_empty()).map(|t| format!("*{t}*")).unwrap_or_default();
     let overview = result.overview.map(|ow| if !tagline.is_empty() { format!("\n\n{ow}") } else { ow }).unwrap_or_default();
     let homepage = result.homepage.filter(|h| !h.is_empty()).map(|h| format!("[Website]({h})")).unwrap_or("No Website".to_string());
