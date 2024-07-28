@@ -66,7 +66,7 @@ run the tool and follow the instructions to install Rust on your system.
 
 > [!WARNING]
 > Please do NOT use the version of Rust provided by your distribution's repositories. The version provided by your distribution
-> is likely out of date compared to what the current version of Rust actually is (1.79.0 at the time of writing); therefore
+> is likely out of date compared to what the current version of Rust actually is (1.80.0 at the time of writing); therefore
 > rustup should be used instead.
 
 Installing Rust inside of Windows Subsystem for Linux is even easier and doesn't require Visual Studio 2022 or the Build
