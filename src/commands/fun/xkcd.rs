@@ -14,32 +14,29 @@ struct XkcdComic {
 
 /// Retrieves the latest or a specific comic from xkcd.
 #[poise::command(slash_command)]
-pub async fn xkcd(
-    context: Context<'_>,
-    #[description = "Retrieve a specific comic."] number: Option<u16>,
-    #[description = "Retrieve a random comic."]
-    #[flag]
-    random: bool
-) -> Result<(), Error> {
-    if number.is_some() && random {
-        context.reply("You cannot provide both a number and the random flag. Please use one or the other!").await?;
-        return Ok(());
-    }
-
+pub async fn xkcd(context: Context<'_>, #[description = "Gets a specific comic."] number: Option<u16>, #[description = "Gets a random comic."] random: Option<bool>) -> Result<(), Error> {
+    let client = &context.data().reqwest_container;
     let comic = match number {
-        None => {
-            if random {
-                let mut rng = rand::thread_rng();
-                let xkcd_range = rng.gen_range(1..2964);
-                &format!("https://xkcd.com/{xkcd_range}/info.0.json")
-            } else {
-                "https://xkcd.com/info.0.json"
-            }
+        None if random.unwrap_or_default() => {
+            let request = client.get("https://xkcd.com/info.0.json").send().await?;
+            let id = request.json::<XkcdComic>().await?.num;
+            let mut rng = rand::thread_rng();
+            let range = loop {
+                let num = rng.gen_range(1..id);
+                if num != 404 {
+                    break num;
+                };
+            };
+            &format!("https://xkcd.com/{range}/info.0.json")
+        }
+        None => "https://xkcd.com/info.0.json",
+        Some(_num) if random.unwrap_or_default() => {
+            context.reply("You cannot provide both a number and the random flag. Please use one or the other!").await?;
+            return Ok(());
         }
         Some(number) => &format!("https://xkcd.com/{number}/info.0.json")
     };
 
-    let client = &context.data().reqwest_container;
     let request = client.get(comic).send().await?;
     if request.status() == StatusCode::NOT_FOUND {
         context.reply("You did not provide a valid comic id.").await?;
