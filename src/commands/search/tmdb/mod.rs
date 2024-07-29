@@ -163,7 +163,7 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     let api_key = &data.config.api.entertainment.tmdb;
     let client = &data.reqwest_container;
     let endpoint = "https://api.themoviedb.org/3/search/tv";
-    let response = client.get(endpoint).query(&[("api_key", &*api_key), ("query", &name)]);
+    let response = client.get(endpoint).query(&[("api_key", api_key), ("query", &name)]);
     let result: SearchResponse = response.send().await?.json().await?;
     let results = result.results;
     if results.is_empty() {
