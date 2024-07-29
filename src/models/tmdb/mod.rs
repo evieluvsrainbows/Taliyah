@@ -106,7 +106,7 @@ pub struct Show {
     pub format: String,                              // The format of the show; can be Scripted, News, or Unscripted.
     pub vote_average: f64,                           // The show's average user score on The Movie Database.
     pub vote_count: i64,                             // The show's total amount of user votes on The Movie Database.
-    pub external_ids: ExternalId                     // The external IDs associated with the show, e.g. the external IMDb ID.
+    // pub external_ids: ExternalId                  // The external IDs associated with the show, e.g. the external IMDb ID.
 }
 
 #[derive(Deserialize)]

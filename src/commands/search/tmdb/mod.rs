@@ -1,6 +1,6 @@
 use crate::{
-    models::tmdb::{Movie, SimplifiedMovie},
-    utils::{format_int, locale},
+    models::tmdb::{Movie, Show, SimplifiedMovie},
+    utils::{calculate_average_sum, format_int, locale},
     Context, Error
 };
 use chrono::NaiveDate;
@@ -31,7 +31,7 @@ pub struct Collection {
 }
 
 /// Commands for interacting with The Movie Database (themoviedb.org).
-#[poise::command(slash_command, subcommands("collection", "movie"))]
+#[poise::command(slash_command, subcommands("collection", "movie", "show"))]
 pub async fn tmdb(_context: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
@@ -151,6 +151,74 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
         .fields(fields)
         .footer(CreateEmbedFooter::new("Powered by TMDb."));
 
+    context.send(CreateReply::default().embed(embed)).await?;
+
+    Ok(())
+}
+
+/// Retrieves detailed information about a given television series.
+#[poise::command(slash_command)]
+pub async fn show(context: Context<'_>, #[description = "The TV series to look up."] name: String) -> Result<(), Error> {
+    let data = &context.data();
+    let api_key = &data.config.api.entertainment.tmdb;
+    let client = &data.reqwest_container;
+    let endpoint = "https://api.themoviedb.org/3/search/tv";
+    let response = client.get(endpoint).query(&[("api_key", &*api_key), ("query", &name)]);
+    let result: SearchResponse = response.send().await?.json().await?;
+    let results = result.results;
+    if results.is_empty() {
+        context.say(format!("No results found for `{name}`. Please try looking for another series.")).await?;
+        return Ok(());
+    }
+
+    let id = results.first().unwrap().id;
+    let endpoint = format!("https://api.themoviedb.org/3/tv/{id}");
+    let response = client.get(&endpoint).query(&[("api_key", &api_key)]).send().await.unwrap();
+    let result: Show = response.json().await.unwrap();
+    let poster_path = result.poster_path.unwrap();
+    let poster = format!("https://image.tmdb.org/t/p/original/{}", &poster_path.replace('/', ""));
+
+    let title = result.name;
+    let tagline = if !result.tagline.is_empty() { format!("*{}*", result.tagline) } else { String::new() };
+    let overview = result.overview;
+    let status = result.status;
+    let format = result.format;
+    let creators = result.created_by.iter().map(|c| &c.name).join("\n");
+    let user_score_count = result.vote_count;
+    let user_score = format!("{}% ({} votes)", (result.vote_average * 10.0).round(), user_score_count);
+    let language = locale::get_language_name_from_iso(&result.original_language).to_string();
+    let languages = result.languages.iter().map(|l| locale::get_language_name_from_iso(l)).join("\n");
+    let origin_countries = result.origin_country.iter().map(|c| locale::get_country_name_from_iso(c)).join("\n");
+    let first_aired = result.first_air_date.format("%B %-e, %Y").to_string();
+    let last_aired = result.last_air_date.format("%B %-e, %Y").to_string();
+    let average_runtime = calculate_average_sum(&result.episode_run_time);
+    let runtime = format_duration(Duration::from_secs(average_runtime as u64 * 60)).to_string();
+    let networks = result.networks.iter().map(|n| &n.name).join("\n");
+    let studios = result.studios.iter().map(|s| &s.name).join("\n");
+    let seasons = result.number_of_seasons.to_string();
+    let episodes = result.number_of_episodes.to_string();
+    let genres = result.genres.iter().map(|genre| &genre.name).join("\n");
+    let url = format!("https://themoviedb.org/tv/{}", &id);
+
+    let mut fields = Vec::with_capacity(15);
+    fields.push(("Overview", &*overview, false));
+    fields.push(("Status", &*status, true));
+    fields.push(("Format", &*format, true));
+    fields.push(("Created By", if !creators.is_empty() { &*creators } else { "Unknown" }, true));
+    fields.push(("Average Runtime", if !result.episode_run_time.is_empty() { &*runtime } else { "Unknown" }, true));
+    fields.push(("User Score", &*user_score, true));
+    fields.push(("First Aired", &*first_aired, true));
+    fields.push(("Last Aired", &*last_aired, true));
+    fields.push(("Main Language", &*language, true));
+    fields.push(("Origin Countries", &*origin_countries, true));
+    fields.push(("Languages", &*languages, true));
+    fields.push(("Seasons", &*seasons, true));
+    fields.push(("Episodes", &*episodes, true));
+    fields.push(("Genres", &*genres, true));
+    fields.push(("Studios", if !result.studios.is_empty() { &*studios } else { "Unknown" }, true));
+    fields.push(("Networks", &*networks, true));
+
+    let embed = CreateEmbed::new().title(title).url(url).color(0x01b4e4).thumbnail(poster).description(tagline).fields(fields);
     context.send(CreateReply::default().embed(embed)).await?;
 
     Ok(())

@@ -11,6 +11,7 @@ pub fn get_language_name_from_iso(lang: &str) -> &str {
     match lang {
         "en" => "English",
         "fr" => "French",
+        "it" => "Italian",
         "ja" => "Japanese",
         "ko" => "Korean",
         "cn" => "Cantonese",

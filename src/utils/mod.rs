@@ -20,3 +20,7 @@ pub fn format_int(int: u64) -> String {
     }
     string
 }
+
+pub fn calculate_average_sum(ints: &[i64]) -> f64 {
+    ints.iter().sum::<i64>() as f64 / ints.len() as f64
+}
