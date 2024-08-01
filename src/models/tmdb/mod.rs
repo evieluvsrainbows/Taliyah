@@ -140,7 +140,6 @@ pub struct Season {
     pub season_number: i64                           // The season's numerical number.
 }
 
-
 #[derive(Deserialize)]
 #[rustfmt::skip]
 pub struct Language {
