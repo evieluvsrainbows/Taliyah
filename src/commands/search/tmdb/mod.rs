@@ -124,7 +124,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
     let poster_uri = result.poster_path.unwrap();
     let poster = format!("https://image.tmdb.org/t/p/original/{}", &poster_uri.replace('/', ""));
     let user_score_count = result.vote_count;
-    let user_score = format!("{}% ({} votes)", (result.vote_average * 10.0).round(), user_score_count);
+    let user_score = format!("{}% ({user_score_count} votes)", (result.vote_average * 10.0).round());
     let runtime = format_duration(Duration::from_secs(result.runtime.unwrap() * 60)).to_string();
     let external_links = format!("{homepage} | {imdb}");
 
@@ -185,7 +185,7 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     let format = result.format;
     let creators = result.created_by.iter().map(|c| &c.name).join("\n");
     let user_score_count = result.vote_count;
-    let user_score = format!("{}% ({} votes)", (result.vote_average * 10.0).round(), user_score_count);
+    let user_score = format!("{}% ({user_score_count} votes)", (result.vote_average * 10.0).round());
     let language = locale::get_language_name_from_iso(&result.original_language).to_string();
     let languages = result.languages.iter().map(|l| locale::get_language_name_from_iso(l)).join("\n");
     let origin_countries = result.origin_country.iter().map(|c| locale::get_country_name_from_iso(c)).join("\n");
@@ -198,7 +198,7 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     let seasons = result.number_of_seasons.to_string();
     let episodes = result.number_of_episodes.to_string();
     let genres = result.genres.iter().map(|genre| &genre.name).join("\n");
-    let url = format!("https://themoviedb.org/tv/{}", &id);
+    let url = format!("https://themoviedb.org/tv/{id}");
 
     let mut fields = Vec::with_capacity(15);
     fields.push(("Overview", &*overview, false));
