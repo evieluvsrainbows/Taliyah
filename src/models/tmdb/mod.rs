@@ -42,71 +42,49 @@ pub struct SimplifiedMovie {
 
 #[derive(Deserialize)]
 #[rustfmt::skip]
+pub struct Show {
+    pub backdrop_path: Option<String>,                // The show's backdrop path.
+    pub created_by: Vec<CreatedBy>,                   // The show's creators.
+    pub episode_run_time: Vec<i64>,                   // An array containing the show's episode runtimes.
+    pub first_air_date: NaiveDate,                    // The date the show first aired.
+    pub genres: Vec<Genre>,                           // The genres that the show is in.
+    pub homepage: String,                             // The show's homepage.
+    pub id: i64,                                      // The show's id on The Movie Database.
+    pub in_production: bool,                          // Whether or not the show is currently in production.
+    pub languages: Vec<String>,                       // The show's available languages.
+    pub last_air_date: NaiveDate,                     // When the show last aired an episode.
+    pub last_episode_to_air: EpisodeToAir,            // The show's last aired episode.
+    pub name: String,                                 // The name of the show.
+    pub next_episode_to_air: Option<EpisodeToAir>,    // The show's next scheduled episode.
+    pub networks: Vec<NetworkOrStudio>,               // The networks or services that air the show.
+    pub number_of_episodes: i64,                      // The total number of episodes the show has aired.
+    pub number_of_seasons: i64,                       // The total number of seasons the show has released.
+    pub origin_country: Vec<String>,                  // The country where the show originated.
+    pub original_language: String,                    // The original language of the show.
+    pub original_name: String,                        // The show's original name.
+    pub overview: String,                             // The show's overview.
+    pub popularity: f64,                              // An integer containing the show's popularity value.
+    pub poster_path: Option<String>,                  // The show's poster path.
+    #[serde(rename = "production_companies")]
+    pub studios: Vec<NetworkOrStudio>,                // The studios that produce and manage the show.
+    pub seasons: Vec<Season>,                         // A vector array containing information on the show's individual seasons.
+    pub spoken_languages: Vec<Language>,              // A vector array containing information about the show's spoken languages.
+    pub status: String,                               // The status of the show; can be Returning Series, Cancelled, or Ended.
+    pub tagline: String,                              // The show's tagline.
+    #[serde(rename = "type")]
+    pub format: String,                               // The format of the show; can be Scripted, News, or Unscripted.
+    pub vote_average: f64,                            // The show's average user score on The Movie Database.
+    pub vote_count: i64,                              // The show's total amount of user votes on The Movie Database.
+    // pub external_ids: ExternalId                   // The external IDs associated with the show, e.g. the external IMDb ID.
+}
+
+#[derive(Deserialize)]
+#[rustfmt::skip]
 pub struct Collection {
     pub id: u64,                                      // The ID of the collection.
     pub name: String,                                 // The name of the collection.
     pub poster_path: String,                          // The poster of the collection.
     pub backdrop_path: String                         // the backdrop of the collection.
-}
-
-#[derive(Deserialize)]
-#[rustfmt::skip]
-pub struct Genre {
-    pub id: u64,                                      // The genre's ID.
-    pub name: String                                  // The genre's name.
-}
-
-#[derive(Deserialize)]
-#[rustfmt::skip]
-pub struct ProductionCompany {
-    pub name: String,                                 // The friendly name of the production company.
-    pub id: u64,                                      // The ID of the production company on The Movie Database.
-    pub origin_country: String                        // The country of origin of the production company.
-}
-
-#[derive(Deserialize)]
-#[rustfmt::skip]
-pub struct ProductionCountry {
-    pub iso_3166_1: String,                           // The ISO standard shortcode of the production country.
-    pub name: String                                  // The friendly name of the production country.
-}
-
-#[derive(Deserialize)]
-#[rustfmt::skip]
-pub struct Show {
-    pub backdrop_path: Option<String>,               // The show's backdrop path.
-    pub created_by: Vec<CreatedBy>,                  // The show's creators.
-    pub episode_run_time: Vec<i64>,                  // An array containing the show's episode runtimes.
-    pub first_air_date: NaiveDate,                   // The date the show first aired.
-    pub genres: Vec<Genre>,                          // The genres that the show is in.
-    pub homepage: String,                            // The show's homepage.
-    pub id: i64,                                     // The show's id on The Movie Database.
-    pub in_production: bool,                         // Whether or not the show is currently in production.
-    pub languages: Vec<String>,                      // The show's available languages.
-    pub last_air_date: NaiveDate,                    // When the show last aired an episode.
-    pub last_episode_to_air: EpisodeToAir,           // The show's last aired episode.
-    pub name: String,                                // The name of the show.
-    pub next_episode_to_air: Option<EpisodeToAir>,   // The show's next scheduled episode.
-    pub networks: Vec<NetworkOrStudio>,              // The networks or services that air the show.
-    pub number_of_episodes: i64,                     // The total number of episodes the show has aired.
-    pub number_of_seasons: i64,                      // The total number of seasons the show has released.
-    pub origin_country: Vec<String>,                 // The country where the show originated.
-    pub original_language: String,                   // The original language of the show.
-    pub original_name: String,                       // The show's original name.
-    pub overview: String,                            // The show's overview.
-    pub popularity: f64,                             // An integer containing the show's popularity value.
-    pub poster_path: Option<String>,                 // The show's poster path.
-    #[serde(rename = "production_companies")]
-    pub studios: Vec<NetworkOrStudio>,               // The studios that produce and manage the show.
-    pub seasons: Vec<Season>,                        // A vector array containing information on the show's individual seasons.
-    pub spoken_languages: Vec<Language>,             // A vector array containing information about the show's spoken languages.
-    pub status: String,                              // The status of the show; can be Returning Series, Cancelled, or Ended.
-    pub tagline: String,                             // The show's tagline.
-    #[serde(rename = "type")]
-    pub format: String,                              // The format of the show; can be Scripted, News, or Unscripted.
-    pub vote_average: f64,                           // The show's average user score on The Movie Database.
-    pub vote_count: i64,                             // The show's total amount of user votes on The Movie Database.
-    // pub external_ids: ExternalId                  // The external IDs associated with the show, e.g. the external IMDb ID.
 }
 
 #[derive(Deserialize)]
@@ -117,6 +95,13 @@ pub struct CreatedBy {
     pub name: String,                                // The name of the given creator.
     pub gender: Option<i64>,                         // The (optional) gender of the given creator.
     pub profile_path: Option<String>                 // The (optional) profile path of the given creator.
+}
+
+#[derive(Deserialize)]
+#[rustfmt::skip]
+pub struct Genre {
+    pub id: u64,                                      // The genre's ID.
+    pub name: String                                  // The genre's name.
 }
 
 #[derive(Deserialize)]
@@ -155,6 +140,7 @@ pub struct Season {
     pub season_number: i64                           // The season's numerical number.
 }
 
+
 #[derive(Deserialize)]
 #[rustfmt::skip]
 pub struct Language {
@@ -175,4 +161,19 @@ pub struct ExternalId {
     pub instagram_id: Option<String>,                // The ID of the show's Instagram profile.
     pub twitter_id: Option<String>,                  // The ID of the show's Twitter profile.
     pub id: Option<i64>                              // The show's The Movie Database identifier.
+}
+
+#[derive(Deserialize)]
+#[rustfmt::skip]
+pub struct ProductionCompany {
+    pub name: String,                                 // The friendly name of the production company.
+    pub id: u64,                                      // The ID of the production company on The Movie Database.
+    pub origin_country: String                        // The country of origin of the production company.
+}
+
+#[derive(Deserialize)]
+#[rustfmt::skip]
+pub struct ProductionCountry {
+    pub iso_3166_1: String,                           // The ISO standard shortcode of the production country.
+    pub name: String                                  // The friendly name of the production country.
 }

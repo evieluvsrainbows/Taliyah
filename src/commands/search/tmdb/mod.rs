@@ -12,18 +12,18 @@ use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFoote
 use std::time::Duration;
 
 #[derive(Deserialize)]
-pub struct SearchResponse {
+struct SearchResponse {
     pub results: Vec<SearchResult>
 }
 
 #[derive(Deserialize)]
-pub struct SearchResult {
+struct SearchResult {
     pub id: u64
 }
 
 #[derive(Deserialize)]
 #[rustfmt::skip]
-pub struct Collection {
+struct Collection {
     pub name: String,                           // The name of the collection.
     pub overview: String,                       // The overview of the collection.
     pub poster_path: String,                    // The poster belonging to the collection.
