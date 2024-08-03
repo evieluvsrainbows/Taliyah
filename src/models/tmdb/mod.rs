@@ -7,9 +7,9 @@ pub struct Movie {
     pub adult: bool,                                  // Whether or not the movie has an adult rating.
     #[serde(rename = "belongs_to_collection")]
     pub collection: Option<Collection>,               // The movie's collection, if applicable.
-    pub backdrop_path: Option<String>,                // The URL of the movie's backdrop.
+    pub backdrop_path: Option<String>,                // The movie's poster packdrop l
     pub budget: u64,                                  // The movie's total budget.
-    pub genres: Vec<Genre>,                           // Genres that apply to the movie.
+    pub genres: Vec<Genre>,                           // The movie's associated genres.
     pub homepage: Option<String>,                     // The movie's website.
     pub id: u64,                                      // The movie's The Movie Database identifier.
     pub imdb_id: Option<String>,                      // The movie's IMDb identifier.
@@ -26,7 +26,6 @@ pub struct Movie {
     pub status: String,                               // The movie's current status as listed on The Movie Database.
     pub tagline: Option<String>,                      // The movie's tagline.
     pub title: String,                                // The movie's title.
-    pub video: bool,                                  // Whether or not this movie has a video available.
     pub vote_average: f64,                            // The movie's average user score on The Movie Database.
     pub vote_count: f64                               // The movie's total amount of votes on The Movie Database.
 }
@@ -50,15 +49,15 @@ pub struct Show {
     pub genres: Vec<Genre>,                           // The genres that the show is in.
     pub homepage: String,                             // The show's homepage.
     pub id: i64,                                      // The show's id on The Movie Database.
-    pub in_production: bool,                          // Whether or not the show is currently in production.
+    pub in_production: bool,                          // The show's current production status.
     pub languages: Vec<String>,                       // The show's available languages.
-    pub last_air_date: NaiveDate,                     // When the show last aired an episode.
+    pub last_air_date: NaiveDate,                     // The show's last known episode air date.
     pub last_episode_to_air: EpisodeToAir,            // The show's last aired episode.
     pub name: String,                                 // The name of the show.
     pub next_episode_to_air: Option<EpisodeToAir>,    // The show's next scheduled episode.
     pub networks: Vec<NetworkOrStudio>,               // The networks or services that air the show.
     pub number_of_episodes: i64,                      // The total number of episodes the show has aired.
-    pub number_of_seasons: i64,                       // The total number of seasons the show has released.
+    pub number_of_seasons: i64,                       // The total number of seasons the show has aired.
     pub origin_country: Vec<String>,                  // The country where the show originated.
     pub original_language: String,                    // The original language of the show.
     pub original_name: String,                        // The show's original name.
@@ -75,7 +74,6 @@ pub struct Show {
     pub format: String,                               // The format of the show; can be Scripted, News, or Unscripted.
     pub vote_average: f64,                            // The show's average user score on The Movie Database.
     pub vote_count: i64,                              // The show's total amount of user votes on The Movie Database.
-    // pub external_ids: ExternalId                   // The external IDs associated with the show, e.g. the external IMDb ID.
 }
 
 #[derive(Deserialize)]
@@ -146,20 +144,6 @@ pub struct Language {
     pub english_name: String,                        // The name of the given language, in English.
     pub iso_639_1: String,                           // The ISO 639-1 identifier associated with the language.
     pub name: String                                 // The native name associated with the language.
-}
-
-#[derive(Deserialize)]
-#[rustfmt::skip]
-pub struct ExternalId {
-    pub imdb_id: Option<String>,                     // The show's IMDb identifier.
-    pub freebase_mid: Option<String>,                // The show's Freebase MID.
-    pub freebase_id: Option<String>,                 // The show's freebase ID.
-    pub tvdb_id: Option<i64>,                        // The show's TVDb identifier.
-    pub tvrage_id: Option<i64>,                      // The show's TVRage identifier.
-    pub facebook_id: Option<String>,                 // The ID of the show's Facebook page.
-    pub instagram_id: Option<String>,                // The ID of the show's Instagram profile.
-    pub twitter_id: Option<String>,                  // The ID of the show's Twitter profile.
-    pub id: Option<i64>                              // The show's The Movie Database identifier.
 }
 
 #[derive(Deserialize)]

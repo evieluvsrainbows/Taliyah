@@ -205,10 +205,14 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     fields.push(("Status", &*status, true));
     fields.push(("Format", &*format, true));
     fields.push(("Created By", if !creators.is_empty() { &*creators } else { "Unknown" }, true));
-    fields.push(("Average Runtime", if !result.episode_run_time.is_empty() { &*runtime } else { "Unknown" }, true));
-    fields.push(("User Score", &*user_score, true));
     fields.push(("First Aired", &*first_aired, true));
     fields.push(("Last Aired", &*last_aired, true));
+    fields.push(("User Score", &*user_score, true));
+    if !result.episode_run_time.is_empty() {
+        fields.push(("Average Runtime", &*runtime, true));
+    } else {
+        fields.push(("\u{200B}", "\u{200B}", true));
+    }
     fields.push(("Main Language", &*language, true));
     fields.push(("Origin Countries", &*origin_countries, true));
     fields.push(("Languages", &*languages, true));
