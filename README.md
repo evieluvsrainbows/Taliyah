@@ -14,6 +14,15 @@ A feature-packed bot for Discord servers, written in Rust with Serenity and vari
 > the contents of the README as shown below are no longer appropriate, however are retained for posterity. Please do not
 > use the contents of this README as a guide on how to setup Taliyah until more of the rewrite has finished. Thank you, and
 > again pardon the dust while this work is ongoing. 😁
+>
+> **November 2024 update**: Development on Taliyah has been paused for the forseeable future due to a lack of desire and
+> drive to continue maintaining the project. However, the codebase will still receive updates to dependencies to keep the
+> project as free of security vulnerabilities as possible. Taliyah will however stay on Serenity 0.12.x and Poise 0.6.x,
+> even if they get new versions, during this pause in development. It should additionally be said and reiterated that
+> development on the project is not ceasing for good, but I am taking a break for at least the short term to try and get
+> my drive and desire back to maintain this project. There is more information about the pause in development located
+> [here](https://github.com/evieluvsrainbows/Taliyah/commit/698537bcb185bcba92e9a9adb1f950a6b8ad26e5), going further into
+> detail on why I am pausing the development of Taliyah, and I encourage anyone who ends up seeing this to read that.
 
 Welcome to the official GitHub / GitLab repository for Taliyah, a bot for the Discord chat platform written in Rust with
 the serenity library, as well as various other libraries. It should be noted that this project is still in a heavy WIP state,
