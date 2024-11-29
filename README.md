@@ -8,12 +8,6 @@ A feature-packed bot for Discord servers, written in Rust with Serenity and vari
 [![GitHub Actions Build Status][github-actions-badge]][github-actions-link]
 
 > [!IMPORTANT]
-> 🚧 **Pardon The Dust** 🚧
->
-> Taliyah is currently undergoing a significant rewrite based around the (relatively) new Poise command framework. Therefore,
-> the contents of the README as shown below are no longer appropriate, however are retained for posterity. Please do not
-> use the contents of this README as a guide on how to setup Taliyah until more of the rewrite has finished. Thank you, and
-> again pardon the dust while this work is ongoing. 😁
 >
 > **November 2024 update**: Development on Taliyah has been paused for the forseeable future due to a lack of desire and
 > drive to continue maintaining the project. However, the codebase will still receive updates to dependencies to keep the
@@ -23,6 +17,13 @@ A feature-packed bot for Discord servers, written in Rust with Serenity and vari
 > my drive and desire back to maintain this project. There is more information about the pause in development located
 > [here](https://github.com/evieluvsrainbows/Taliyah/commit/698537bcb185bcba92e9a9adb1f950a6b8ad26e5), going further into
 > detail on why I am pausing the development of Taliyah, and I encourage anyone who ends up seeing this to read that.
+>
+> 🚧 **Pardon The Dust** 🚧
+>
+> Taliyah is currently undergoing a significant rewrite based around the (relatively) new Poise command framework. Therefore,
+> the contents of the README as shown below are no longer appropriate, however are retained for posterity. Please do not
+> use the contents of this README as a guide on how to setup Taliyah until more of the rewrite has finished. Thank you, and
+> again pardon the dust while this work is ongoing. 😁
 
 Welcome to the official GitHub / GitLab repository for Taliyah, a bot for the Discord chat platform written in Rust with
 the serenity library, as well as various other libraries. It should be noted that this project is still in a heavy WIP state,
