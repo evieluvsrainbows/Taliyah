@@ -17,7 +17,7 @@ impl EventHandler for Handler {
         let total = gateway.session_start_limit.total;
         let remaining = gateway.session_start_limit.remaining;
 
-        info!("Successfully logged into Discord as the following user:");
+        info!("Successfully logged into the Discord API as the following user:");
         info!("Bot details: {} (User ID: {})", ready.user.tag(), ready.user.id);
         info!("Bot owner: {} (User ID: {})", owner.tag(), owner.id.to_string());
 
