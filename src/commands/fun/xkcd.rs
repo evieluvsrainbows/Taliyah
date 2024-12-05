@@ -1,4 +1,5 @@
 use crate::{models::Comic, Context, Error};
+use poise::CreateReply;
 use rand::Rng;
 use reqwest::StatusCode;
 use serenity::all::{CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter};
@@ -47,7 +48,7 @@ pub async fn xkcd(context: Context<'_>, #[description = "Gets a specific comic."
         .footer(CreateEmbedFooter::new(format!("xkcd comic no. {num}")));
 
     let links = CreateActionRow::Buttons(vec![CreateButton::new_link(page).label("View on xkcd"), CreateButton::new_link(wiki).label("View wiki")]);
-    context.send(poise::CreateReply::default().embed(embed).components(vec![links])).await?;
+    context.send(CreateReply::default().embed(embed).components(vec![links])).await?;
 
     Ok(())
 }
