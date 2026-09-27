@@ -54,8 +54,8 @@ To install Visual Studio 2026, or the Visual Studio 2026 Build Tools, please vis
 accessed by [clicking here](https://visualstudio.microsoft.com/), and click on the Download Visual Studio button at the top
 of the page to download the Visual Studio installer. When in the installer, choose any edition you prefer; the Community
 edition works fine. Or, if you would just like to install the Build Tools instead of installing the IDE, you can visit
-[this URL](https://visualstudio.microsoft.com/downloads/), scroll down to All Downloads section, expand the "Tools for
-Visual Studio"section, and click the Download button next to "Build Tools for Visual Studio 2026".
+[this URL](https://visualstudio.microsoft.com/downloads/), scroll down to All Downloads, expand the "Tools for Visual Studio"
+section, and click the Download button next to "Build Tools for Visual Studio 2026".
 
 Next, we will need to install the `rustup` tool, which allows easy managemnt of Rust toolchain installations as well as easy
 updating of Rust when new versions are available. To download rustup, visit the website located [here](https://rustup.rs/)
@@ -84,7 +84,7 @@ When GCC and the other build tools are installed, run the following command to i
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-> [!TIP]`
+> [!TIP]
 > To install `rustup`, `rustc`, and `cargo` to a different install location, create both the `RUSTUP_HOME` and `CARGO_HOME`
 > system environment variables under the System Properties window in Windows, under Advanced. The `rustup` tool does not
 > currently offer a user-friendly way of changing the instal location, but this is an option if you would like to install
