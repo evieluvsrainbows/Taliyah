@@ -25,7 +25,7 @@ humantime           = "2.4.0"
 itertools           = "0.15.0"
 poise               = "0.7.0"
 reqwest             = { version = "0.12.28", default-features = false, features = ["json", "multipart", "stream", "rustls-tls"]}
-serenity            = "0.12.5"
+serenity            = { version = "0.12.5", features = ["unstable_discord_api"] }
 serde               = { version = "1.0.229", features = ["derive"] }
 serde_json          = "1.0.151"
 tokio               = { version = "1.53.1", features = ["full"] }

@@ -1,5 +1,6 @@
 pub mod locale;
 pub mod time;
+pub mod user_utils;
 
 use crate::config::ConfigurationData;
 
