@@ -1,7 +1,7 @@
 use crate::{
+    Context, Error,
     models::tmdb::{Movie, Show, SimplifiedMovie},
-    utils::{calculate_average_sum, format_int, locale},
-    Context, Error
+    utils::{calculate_average_sum, format_int, locale}
 };
 use chrono::NaiveDate;
 use humantime::format_duration;
@@ -122,7 +122,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
     let url = format!("https://www.themoviedb.org/movie/{id}");
     let genres = result.genres.iter().map(|g| &g.name).join("\n");
     let poster_uri = result.poster_path.unwrap();
-    let poster = format!("https://image.tmdb.org/t/p/original/{}", &poster_uri.replace('/', ""));
+    let poster = format!("https://image.tmdb.org/t/p/original/{}", poster_uri.replace('/', ""));
     let user_score_count = result.vote_count;
     let user_score = format!("{}% ({user_score_count} votes)", (result.vote_average * 10.0).round());
     let runtime = format_duration(Duration::from_secs(result.runtime.unwrap() * 60)).to_string();
@@ -176,7 +176,7 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     let response = client.get(&endpoint).query(&[("api_key", &api_key)]).send().await.unwrap();
     let result: Show = response.json().await.unwrap();
     let poster_path = result.poster_path.unwrap();
-    let poster = format!("https://image.tmdb.org/t/p/original/{}", &poster_path.replace('/', ""));
+    let poster = format!("https://image.tmdb.org/t/p/original/{}", poster_path.replace('/', ""));
 
     let title = result.name;
     let tagline = if !result.tagline.is_empty() { format!("*{}*", result.tagline) } else { String::new() };
