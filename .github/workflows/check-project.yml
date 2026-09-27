@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   check:
-    name: Cargo Check
+    name: Check for errors
     strategy:
       matrix:
         os: [ubuntu-26.04, macos-latest, windows-latest]
@@ -14,8 +14,8 @@ jobs:
       - run: cargo check
 
   lints:
-    name: Check lints
-    runs-on: ubuntu-24.04
+    name: Check linting / formatting
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
 
