@@ -1,3 +1,2 @@
-pub mod fun;
+pub mod info;
 pub mod search;
-pub mod utilities;

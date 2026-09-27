@@ -2,31 +2,34 @@
 name                = "taliyah"
 version             = "0.7.0-alpha"
 authors             = ["evieluvsrainbows"]
-description         = "A Discord bot written in Rust with Serenity."
+description         = "A Discord bot written in Rust with Serenity and Poise."
 homepage            = "https://github.com/evieluvsrainbows/taliyah"
 repository          = "https://github.com/evieluvsrainbows/taliyah.git"
 keywords            = ["discord", "discord-api", "bot", "serenity"]
-edition             = "2021"
+edition             = "2024"
 license             = "MIT"
 readme              = "README.md"
 include             = ["src/**/*", "config.sample.toml", "Cargo.toml", "README.md"]
 
+[profile.release]
+opt-level           = 3
+lto                 = true
+codegen-units       = 1
+panic               = "abort"
+strip               = true
+
 [dependencies]
-anyhow              = "1.0.86"
-byte-unit           = "5.1.4"
-chrono              = "0.4.38"
-humantime           = "2.1.0"
-itertools           = "0.13.0"
-poise               = "0.6.1"
-rand                = "0.8.5"
-reqwest             = { version = "0.12.5", default-features = false, features = ["json", "multipart", "stream", "rustls-tls"]}
-rspotify            = "0.13.2"
-serenity            = "0.12.2"
-serde               = { version = "1.0.208", features = ["derive"] }
-serde_json          = "1.0.125"
-tokio               = { version = "1.39.3", features = ["full"] }
-toml                = "0.8.19"
-tracing             = "0.1.40"
-tracing-futures     = "0.2.5"
+anyhow              = "1.0.104"
+chrono              = "0.4.45"
+humantime           = "2.4.0"
+itertools           = "0.15.0"
+poise               = "0.7.0"
+reqwest             = { version = "0.12.28", default-features = false, features = ["json", "multipart", "stream", "rustls-tls"]}
+serenity            = "0.12.5"
+serde               = { version = "1.0.229", features = ["derive"] }
+serde_json          = "1.0.151"
+tokio               = { version = "1.53.1", features = ["full"] }
+toml                = "1.1.6"
+tracing             = "0.1.44"
 tracing-log         = "0.2.0"
-tracing-subscriber  = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber  = { version = "0.3.23", features = ["env-filter"] }

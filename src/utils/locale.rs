@@ -256,7 +256,7 @@ pub fn get_country_name_from_iso(country: &str) -> &str {
         "UA" => "Ukraine",
         "AE" => "United Arab Emirates",
         "GB" => "United Kingdom",
-        "US" => "United States",
+        "US" => "United States of America",
         "UM" => "US Minor Outlying Islands",
         "UY" => "Uruguay",
         "UZ" => "Uzbekistan",

@@ -8,16 +8,6 @@ A feature-packed bot for Discord servers, written in Rust with Serenity and vari
 [![GitHub Actions Build Status][github-actions-badge]][github-actions-link]
 
 > [!IMPORTANT]
->
-> **November 2024 update**: Development on Taliyah has been paused for the forseeable future due to a lack of desire and
-> drive to continue maintaining the project. However, the codebase will still receive updates to dependencies to keep the
-> project as free of security vulnerabilities as possible. Taliyah will however stay on Serenity 0.12.x and Poise 0.6.x,
-> even if they get new versions, during this pause in development. It should additionally be said and reiterated that
-> development on the project is not ceasing for good, but I am taking a break for at least the short term to try and get
-> my drive and desire back to maintain this project. There is more information about the pause in development located
-> [here](https://github.com/evieluvsrainbows/Taliyah/commit/698537bcb185bcba92e9a9adb1f950a6b8ad26e5), going further into
-> detail on why I am pausing the development of Taliyah, and I encourage anyone who ends up seeing this to read that.
->
 > 🚧 **Pardon The Dust** 🚧
 >
 > Taliyah is currently undergoing a significant rewrite based around the (relatively) new Poise command framework. Therefore,
@@ -40,7 +30,7 @@ so please keep an eye on this repository for any new features and updates, as we
 
 Before we can get Taliyah up and running, we'll need to install a couple pieces of software in order for Taliyah to actually
 build and run. This will depend on your operating system, be it either Windows, macOS or Linux. On Windows, this means you'll
-need to have Visual Studio 2022 installed, be it the full IDE or the Build Tools, and Rust itself. On macOS, you will need
+need to have Visual Studio 2026 installed, be it the full IDE or the Build Tools, and Rust itself. On macOS, you will need
 the Xcode Developer Tools, as it includes the system compiler (`clang`) necessary to build Rust programs and libraries, or
 you could also go with simply installing Rust with `homebrew` or MacPorts. On Linux, you don't need to install anything in
 most cases, as most Linux distributions such as Ubuntu and Fedora already have the `gcc` toolchain installed, however if
@@ -53,19 +43,19 @@ distribution of choice, or, on macOS, with `homebrew` or MacPorts.
 
 All in all, you will need the following prerequisites for Taliyah to build and run:
 
-* Visual Studio 2022 / Visual Studio 2022 Build Tools (*Windows (non-WSL) only*)
+* Visual Studio 2026 / Visual Studio 2026 Build Tools (*Windows (non-WSL) only*)
 * Xcode and the Command Line Tools (macOS)
 * Git, preferably latest stable
 * Rust, preferably latest nightly
 
 #### Windows
 
-To install Visual Studio 2022, or the Visual Studio 2022 Build Tools, please visit the Visual Studio website, which can be
+To install Visual Studio 2026, or the Visual Studio 2026 Build Tools, please visit the Visual Studio website, which can be
 accessed by [clicking here](https://visualstudio.microsoft.com/), and click on the Download Visual Studio button at the top
 of the page to download the Visual Studio installer. When in the installer, choose any edition you prefer; the Community
 edition works fine. Or, if you would just like to install the Build Tools instead of installing the IDE, you can visit
 [this URL](https://visualstudio.microsoft.com/downloads/), scroll down to All Downloads section, expand the "Tools for
-Visual Studio"section, and click the Download button next to "Build Tools for Visual Studio 2022".
+Visual Studio"section, and click the Download button next to "Build Tools for Visual Studio 2026".
 
 Next, we will need to install the `rustup` tool, which allows easy managemnt of Rust toolchain installations as well as easy
 updating of Rust when new versions are available. To download rustup, visit the website located [here](https://rustup.rs/)
@@ -79,7 +69,7 @@ run the tool and follow the instructions to install Rust on your system.
 > is likely out of date compared to what the current version of Rust actually is (1.80.0 at the time of writing); therefore
 > rustup should be used instead.
 
-Installing Rust inside of Windows Subsystem for Linux is even easier and doesn't require Visual Studio 2022 or the Build
+Installing Rust inside of Windows Subsystem for Linux is even easier and doesn't require Visual Studio 2026 or the Build
 Tools. It should be noted as well that these instructions also apply to machines running Linux natively, as WSL is just a
 virtual machine that has been tightly integrated into Windows.
 
@@ -94,7 +84,7 @@ When GCC and the other build tools are installed, run the following command to i
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-> [!TIP]
+> [!TIP]`
 > To install `rustup`, `rustc`, and `cargo` to a different install location, create both the `RUSTUP_HOME` and `CARGO_HOME`
 > system environment variables under the System Properties window in Windows, under Advanced. The `rustup` tool does not
 > currently offer a user-friendly way of changing the instal location, but this is an option if you would like to install
@@ -105,14 +95,14 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Now, clone the Taliyah repository to your system using git:
 
 ```bash
-git clone https://github.com/evelynharthbrooke/Taliyah.git
+git clone https://github.com/evieluvsrainbows/Taliyah.git
 ```
 
 If you'd like to use GitLab for the cloning process instead of GitHub, you can do that too. Just use the following command
 instead to clone from Taliyah's GitLab mirror.
 
 ```bash
-git clone https://gitlab.com/evelynharthbrooke/Taliyah.git
+git clone https://gitlab.com/evieluvsrainbows/Taliyah.git
 ```
 
 Then, `cd` into the directory you downloaded Taliyah to:
@@ -166,11 +156,11 @@ with regards to this software.
 [invite-link]: https://discordapp.com/oauth2/authorize?client_id=483499705108529163&scope=bot
 [invite-badge]: https://img.shields.io/badge/invite-to%20your%20Discord%20server-7289da.svg?style=flat-square&logo=discord
 
-[dependency-link]: https://deps.rs/repo/github/evelynharthbrooke/Taliyah
-[dependency-badge]: https://deps.rs/repo/github/evelynharthbrooke/Taliyah/status.svg
+[dependency-link]: https://deps.rs/repo/github/evieluvsrainbows/Taliyah
+[dependency-badge]: https://deps.rs/repo/github/evieluvsrainbows/Taliyah/status.svg
 
-[license-link]: https://github.com/evelynharthbrooke/Taliyah/blob/main/LICENSE.md
-[license-badge]: https://img.shields.io/github/license/evelynharthbrooke/Taliyah.svg?color=ff1f46&style=flat-square
+[license-link]: https://github.com/evieluvsrainbows/Taliyah/blob/main/LICENSE.md
+[license-badge]: https://img.shields.io/github/license/evieluvsrainbows/Taliyah.svg?color=ff1f46&style=flat-square
 
-[github-actions-link]: https://github.com/evelynharthbrooke/Taliyah/actions?query=workflow%3A%22Check+Project%22
-[github-actions-badge]: https://github.com/evelynharthbrooke/Taliyah/workflows/Check%20Project/badge.svg
+[github-actions-link]: https://github.com/evieluvsrainbows/Taliyah/actions?query=workflow%3A%22Check+Project%22
+[github-actions-badge]: https://github.com/evieluvsrainbows/Taliyah/workflows/Check%20Project/badge.svg
