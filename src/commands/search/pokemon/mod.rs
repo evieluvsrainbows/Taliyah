@@ -340,7 +340,7 @@ async fn build_pokemon_reply(
         .field("Egg Groups", egg_str, true)
         .field("Catch Rate", catch_rate_str, true)
         .field("EV Yield", ev_yield_str, true)
-        .field("Base Exp", base_exp_str, true)
+        .field("Base Exp.", base_exp_str, true)
         .field("Base Friendship", happiness_str, true)
         .field("Generation", gen_str, true)
         .color(primary_type_color)
