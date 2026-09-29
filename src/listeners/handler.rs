@@ -10,7 +10,7 @@ pub struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, context: Context, ready: Ready) {
         let http = &context.http;
-        let guilds = ready.guilds.len();
+        let servers = ready.guilds.len();
         let (gateway_res, app_info_res) = tokio::join!(http.get_bot_gateway(), http.get_current_application_info());
         let gateway = match gateway_res {
             Ok(g) => g,
@@ -42,11 +42,11 @@ impl EventHandler for Handler {
         }
 
         info!("Connected to the Discord API (version {version}) with {remaining}/{total} sessions remaining.");
-        info!("Connected to and serving a total of {guilds} guild(s).");
+        info!("Connected to and serving a total of {servers} server(s).");
 
-        let status_text = match guilds {
-            1 => "on 1 guild".to_string(),
-            _ => format!("on {guilds} guilds")
+        let status_text = match servers {
+            1 => "on 1 server".to_string(),
+            _ => format!("on {servers} servers")
         };
 
         context.set_presence(Some(ActivityData::playing(status_text)), OnlineStatus::Online);

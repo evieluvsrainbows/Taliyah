@@ -30,17 +30,11 @@ struct Collection {
     pub parts: Vec<SimplifiedMovie>             // The movies part of the collection.
 }
 
-/// Commands for interacting with The Movie Database (themoviedb.org).
-#[poise::command(slash_command, subcommands("collection", "movie", "show"))]
-pub async fn tmdb(_context: Context<'_>) -> Result<(), Error> {
-    Ok(())
-}
-
 /// Retrieves detailed information about a given collection.
 #[poise::command(slash_command)]
 pub async fn collection(context: Context<'_>, #[description = "The name of the collection."] name: String) -> Result<(), Error> {
     let data = &context.data();
-    let client = &data.reqwest_container;
+    let client = &data.reqwest_client;
     let api_key = &data.config.api.entertainment.tmdb;
     let search_response = client.get("https://api.themoviedb.org/3/search/collection").query(&[("api_key", api_key), ("query", &name)]);
     let search_result: SearchResponse = search_response.send().await?.json().await?;
@@ -87,7 +81,7 @@ pub async fn collection(context: Context<'_>, #[description = "The name of the c
 pub async fn movie(context: Context<'_>, #[description = "Film name"] name: String, #[description = "Film release year"] year: Option<u16>) -> Result<(), Error> {
     let data = &context.data();
     let api_key = &data.config.api.entertainment.tmdb;
-    let client = &data.reqwest_container;
+    let client = &data.reqwest_client;
     let endpoint = "https://api.themoviedb.org/3/search/movie";
     let response = match year {
         Some(year) => client.get(endpoint).query(&[("api_key", api_key), ("query", &name), ("year", &year.to_string())]),
@@ -161,7 +155,7 @@ pub async fn movie(context: Context<'_>, #[description = "Film name"] name: Stri
 pub async fn show(context: Context<'_>, #[description = "The TV series to look up."] name: String) -> Result<(), Error> {
     let data = &context.data();
     let api_key = &data.config.api.entertainment.tmdb;
-    let client = &data.reqwest_container;
+    let client = &data.reqwest_client;
     let endpoint = "https://api.themoviedb.org/3/search/tv";
     let response = client.get(endpoint).query(&[("api_key", api_key), ("query", &name)]);
     let result: SearchResponse = response.send().await?.json().await?;
@@ -225,5 +219,16 @@ pub async fn show(context: Context<'_>, #[description = "The TV series to look u
     let embed = CreateEmbed::new().title(title).url(url).color(0x01b4e4).thumbnail(poster).description(tagline).fields(fields);
     context.send(CreateReply::default().embed(embed)).await?;
 
+    Ok(())
+}
+
+/// Commands for interacting with The Movie Database (themoviedb.org).
+#[poise::command(
+    slash_command,
+    install_context = "User",
+    interaction_context = "Guild|BotDm|PrivateChannel",
+    subcommands("collection", "movie", "show")
+)]
+pub async fn tmdb(_context: Context<'_>) -> Result<(), Error> {
     Ok(())
 }

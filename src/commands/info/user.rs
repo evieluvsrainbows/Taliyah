@@ -161,12 +161,12 @@ pub async fn info(context: Context<'_>, #[description = "The member whose inform
         .description(format!(
             "{active_status}{activities_text}\
             **__User Information__**:\n\
-            **Type**: {account_type}\n\
+            **Account Type**: {account_type}\n\
             **Profile**: <@{id}>\n\
-            **Tag**: {}\n\
-            **ID**: {id}\n\
+            **Username**: {}\n\
+            **User ID**: {id}\n\
             **Creation Date**: {created}\n\n\
-            **__Guild-related Information__**:\n\
+            **__Server-related Information__**:\n\
             **Join Date**: {joined}\n\
             **Nickname**: {nickname}\n\
             **Display Color**: {hex}\n\

@@ -1,15 +1,15 @@
 use crate::{Context, Error};
-use ::serenity::model::{guild::Member, id::UserId};
-use poise::serenity_prelude as serenity;
+use serenity::builder::{AutocompleteChoice, CreateAutocompleteResponse, EditChannel};
+use serenity::model::{guild::Member, id::UserId};
 
 /// A set of commands related to moderating the server.
-#[poise::command(slash_command, subcommands("ban", "unban", "kick", "slowmode"), guild_only)]
+#[poise::command(slash_command, guild_only, subcommands("ban", "unban", "kick", "slowmode"))]
 pub async fn moderation(_context: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
 /// Bans someone from the server.
-#[poise::command(slash_command, required_permissions = "BAN_MEMBERS", required_bot_permissions = "BAN_MEMBERS")]
+#[poise::command(slash_command, guild_only, required_permissions = "BAN_MEMBERS", required_bot_permissions = "BAN_MEMBERS")]
 pub async fn ban(
     context: Context<'_>,
     #[description = "The member to ban."] member: Option<Member>,
@@ -51,7 +51,7 @@ pub async fn unban(context: Context<'_>, #[description = "The user ID of the per
 }
 
 /// Kicks someone from the server.
-#[poise::command(slash_command, required_permissions = "KICK_MEMBERS", required_bot_permissions = "KICK_MEMBERS")]
+#[poise::command(slash_command, guild_only, required_permissions = "KICK_MEMBERS", required_bot_permissions = "KICK_MEMBERS")]
 pub async fn kick(
     context: Context<'_>,
     #[description = "The member to kick."] member: Member,
@@ -69,17 +69,48 @@ pub async fn kick(
     Ok(())
 }
 
+async fn autocomplete_seconds(_context: Context<'_>, partial: &str) -> CreateAutocompleteResponse {
+    let choices = [
+        ("Off (0s)", 0u16),
+        ("5 seconds", 5),
+        ("10 seconds", 10),
+        ("15 seconds", 15),
+        ("30 seconds", 30),
+        ("1 minute (60s)", 60),
+        ("2 minutes (120s)", 120),
+        ("5 minutes (300s)", 300),
+        ("10 minutes (600s)", 600),
+        ("15 minutes (900s)", 900),
+        ("30 minutes (1800s)", 1800),
+        ("1 hour (3600s)", 3600),
+        ("2 hours (7200s)", 7200),
+        ("6 hours (21600s)", 21600)
+    ];
+
+    let filtered_choices = choices
+        .iter()
+        .filter(|(name, val)| name.to_lowercase().contains(&partial.to_lowercase()) || val.to_string().starts_with(partial))
+        .map(|&(name, val)| AutocompleteChoice::new(name, val));
+
+    CreateAutocompleteResponse::new().set_choices(filtered_choices.collect())
+}
+
 /// Sets the slowmode rate for the current channel.
 #[poise::command(slash_command, guild_only, required_permissions = "MANAGE_CHANNELS")]
-pub async fn slowmode(context: Context<'_>, #[description = "The slowmode rate in seconds (leave empty to view current rate)"] seconds: Option<u16>) -> Result<(), Error> {
+pub async fn slowmode(
+    context: Context<'_>,
+    #[description = "The slowmode rate in seconds (leave empty to view current rate)"]
+    #[autocomplete = autocomplete_seconds]
+    seconds: Option<u16>
+) -> Result<(), Error> {
     let channel_id = context.channel_id();
     let response = if let Some(slowmode_rate) = seconds {
-        let edit_builder = serenity::EditChannel::new().rate_limit_per_user(slowmode_rate);
-        if let Err(why) = channel_id.edit(context.http(), edit_builder).await {
+        let builder = EditChannel::new().rate_limit_per_user(slowmode_rate);
+        if let Err(why) = channel_id.edit(context.http(), builder).await {
             tracing::error!("Error setting channel slowmode rate: {:?}", why);
             format!("Failed to set slowmode to `{slowmode_rate}` seconds.")
         } else if slowmode_rate == 0 {
-            "I have disabled slowmode for this channel. Users can now send messages without waiting.".to_string()
+            "I have disabled slowmode for this channel. Server members can now send messages without waiting.".to_string()
         } else {
             format!("Successfully set the channel slowmode rate to **{slowmode_rate}** seconds.")
         }
