@@ -39,7 +39,12 @@ async fn main() -> Result<(), Error> {
         info!("Tracing initialized with default level {}", default_level);
     }
 
-    let commands = vec![commands::info::bot::bot(), commands::info::user::user(), commands::search::tmdb::tmdb()];
+    let commands = vec![
+        commands::info::bot::bot(),
+        commands::info::user::user(),
+        commands::moderation::moderation(),
+        commands::search::tmdb::tmdb(),
+    ];
 
     let token = configuration.bot.discord.token.clone();
     let config_clone = configuration.clone();
