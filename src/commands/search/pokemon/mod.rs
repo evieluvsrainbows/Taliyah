@@ -370,18 +370,19 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
                 };
 
                 if let Some(selected_name) = selected_value
-                    && let Some(new_data) = fetch_full_data(client, selected_name).await? {
-                        session_data = new_data;
+                    && let Some(new_data) = fetch_full_data(client, selected_name).await?
+                {
+                    session_data = new_data;
 
-                        let (new_embed, new_components) = build_pokemon_reply(client, &session_data, &session_evo_stages, session_shiny, false).await?;
+                    let (new_embed, new_components) = build_pokemon_reply(client, &session_data, &session_evo_stages, session_shiny, false).await?;
 
-                        current_embed = new_embed;
-                        current_components = new_components;
+                    current_embed = new_embed;
+                    current_components = new_components;
 
-                        handle
-                            .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
-                            .await?;
-                    }
+                    handle
+                        .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
+                        .await?;
+                }
             }
             _ => {}
         }
