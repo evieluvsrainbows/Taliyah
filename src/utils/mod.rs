@@ -6,12 +6,12 @@ pub mod user_utils;
 
 use crate::config::ConfigurationData;
 
-pub fn read_config(file: &str) -> ConfigurationData {
+pub(crate) fn read_config(file: &str) -> ConfigurationData {
     let contents = std::fs::read_to_string(file).unwrap();
     toml::from_str(&contents).unwrap()
 }
 
-pub fn escape_markdown(text: &str) -> String {
+pub(crate) fn escape_markdown(text: &str) -> String {
     text.chars()
         .flat_map(|c| match c {
             '*' | '_' | '~' | '`' | '|' | '\\' => vec!['\\', c],
@@ -20,7 +20,7 @@ pub fn escape_markdown(text: &str) -> String {
         .collect()
 }
 
-pub fn uppercase_first(s: &str) -> String {
+pub(crate) fn uppercase_first(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
         None => String::new(),
@@ -28,7 +28,15 @@ pub fn uppercase_first(s: &str) -> String {
     }
 }
 
-pub fn format_multiplier(m: f32) -> String {
+pub(crate) fn extract_id_from_url(url: &str) -> Option<u32> {
+    url.trim_end_matches('/').split('/').next_back()?.parse::<u32>().ok()
+}
+
+pub(crate) fn clean_name(name: &str) -> String {
+    uppercase_first(&name.replace('-', " "))
+}
+
+pub(crate) fn format_multiplier(m: f32) -> String {
     if m == 0.25 {
         "0.25x".to_string()
     } else if m == 0.5 {
@@ -38,7 +46,7 @@ pub fn format_multiplier(m: f32) -> String {
     }
 }
 
-pub fn format_int(int: u64) -> String {
+pub(crate) fn format_int(int: u64) -> String {
     let mut result = String::new();
     for (idx, val) in int.to_string().chars().rev().enumerate() {
         if idx != 0 && idx % 3 == 0 {

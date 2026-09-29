@@ -1,3 +1,5 @@
+use crate::utils;
+
 pub fn normalize_pokemon_name(name: &str) -> String {
     name.trim().to_lowercase().replace("♀", "-f").replace("♂", "-m").replace([' ', '.'], "-")
 }
@@ -24,6 +26,39 @@ pub(crate) fn format_weight(hectograms: u32) -> String {
     let kg = hectograms as f32 / 10.0;
     let lbs = kg * 2.20462;
     format!("{kg:.1} kg ({lbs:.1} lbs)")
+}
+
+pub(crate) fn format_form_label(raw_name: &str) -> String {
+    let parts: Vec<&str> = raw_name.split('-').collect();
+
+    if parts.len() <= 1 {
+        return format!("{} (Regular)", utils::uppercase_first(raw_name));
+    }
+
+    let base_name = utils::uppercase_first(parts[0]);
+    let suffix = parts[1..].join("-");
+
+    // Check if the suffix is a recognized form or variant
+    let form_parts = parts[1..]
+        .iter()
+        .map(|p| match *p {
+            "mega" => "Mega".to_string(),
+            "gmax" => "Gigantamax".to_string(),
+            "alola" => "Alolan".to_string(),
+            "galar" => "Galarian".to_string(),
+            "hisui" => "Hisuian".to_string(),
+            "paldea" => "Paldean".to_string(),
+            other => utils::uppercase_first(other)
+        })
+        .collect::<Vec<_>>()
+        .join(" ");
+
+    // Handle single-form gender/variant cases like "deoxys-normal" or default varieties
+    if suffix.eq_ignore_ascii_case("default") || suffix.eq_ignore_ascii_case("normal") {
+        format!("{base_name} (Regular)")
+    } else {
+        format!("{base_name} ({form_parts})")
+    }
 }
 
 pub fn get_type_color(type_name: &str) -> u32 {

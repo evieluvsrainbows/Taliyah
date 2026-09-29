@@ -1,8 +1,15 @@
 use serde::Deserialize;
 
+#[derive(Clone)]
+pub struct FormOption {
+    pub name: String,
+    pub label: String
+}
+
 pub(crate) struct PokemonData {
     pub(crate) pokemon: Pokemon,
-    pub(crate) species: Option<PokemonSpecies>
+    pub(crate) species: Option<PokemonSpecies>,
+    pub(crate) available_forms: Vec<FormOption>
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -15,6 +22,7 @@ pub(crate) struct Pokemon {
     pub(crate) types: Vec<PokemonTypeSlot>,
     pub(crate) abilities: Vec<PokemonAbilitySlot>,
     pub(crate) stats: Vec<PokemonStat>,
+    pub(crate) species: NamedApiResource,
     pub(crate) sprites: Sprites
 }
 
@@ -58,6 +66,7 @@ pub(crate) struct OfficialArtwork {
 
 #[derive(Debug, Deserialize, Clone)]
 pub(crate) struct PokemonSpecies {
+    pub(crate) name: String,
     pub(crate) gender_rate: i32,
     pub(crate) capture_rate: u32,
     pub(crate) base_happiness: Option<u32>,
@@ -67,7 +76,14 @@ pub(crate) struct PokemonSpecies {
     pub(crate) generation: NamedApiResource,
     pub(crate) egg_groups: Vec<NamedApiResource>,
     pub(crate) flavor_text_entries: Vec<FlavorTextEntry>,
-    pub(crate) evolution_chain: UrlResource
+    pub(crate) evolution_chain: UrlResource,
+    pub(crate) varieties: Vec<PokemonVariety>
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub(crate) struct PokemonVariety {
+    pub(crate) is_default: bool,
+    pub(crate) pokemon: NamedApiResource
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -83,7 +99,8 @@ pub(crate) struct UrlResource {
 
 #[derive(Debug, Deserialize, Clone)]
 pub(crate) struct NamedApiResource {
-    pub(crate) name: String
+    pub(crate) name: String,
+    pub(crate) url: String
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -94,7 +111,33 @@ pub(crate) struct EvolutionChain {
 #[derive(Debug, Deserialize, Clone)]
 pub(crate) struct ChainLink {
     pub(crate) species: NamedApiResource,
-    pub(crate) evolves_to: Vec<ChainLink>
+    pub(crate) evolves_to: Vec<ChainLink>,
+    pub evolution_details: Vec<EvolutionDetail>
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct EvolutionChainResponse {
+    pub id: u32,
+    pub chain: ChainLink
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct EvolutionDetail {
+    pub trigger: NamedApiResource,
+    pub item: Option<NamedApiResource>,
+    pub held_item: Option<NamedApiResource>,
+    pub known_move: Option<NamedApiResource>,
+    pub known_move_type: Option<NamedApiResource>,
+    pub min_level: Option<u32>,
+    pub min_happiness: Option<u32>,
+    pub min_beauty: Option<u32>,
+    pub min_affection: Option<u32>,
+    pub time_of_day: Option<String>,
+    pub location: Option<NamedApiResource>,
+    pub needs_overworld_rain: Option<bool>,
+    pub gender: Option<u8>,
+    pub turn_upside_down: Option<bool>,
+    pub relative_physical_stats: Option<i32>
 }
 
 #[derive(Debug, Deserialize, Clone)]

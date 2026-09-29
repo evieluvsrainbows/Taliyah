@@ -19,19 +19,37 @@ async fn fetch_pokemon(client: &reqwest::Client, normalized_name: &str) -> Resul
     }
 }
 
-async fn fetch_species(client: &reqwest::Client, id: u32) -> Option<PokemonSpecies> {
-    let url = format!("https://pokeapi.co/api/v2/pokemon-species/{id}/");
+async fn fetch_species(client: &reqwest::Client, species_url_or_id: &str) -> Option<PokemonSpecies> {
+    let url = if species_url_or_id.starts_with("http") {
+        species_url_or_id.to_string()
+    } else {
+        format!("https://pokeapi.co/api/v2/pokemon-species/{species_url_or_id}/")
+    };
     client.get(&url).send().await.ok()?.json().await.ok()
 }
 
-async fn fetch_full_data(client: &reqwest::Client, name: &str) -> Result<Option<PokemonData>, Error> {
-    let normalized = utils::pokemon::normalize_pokemon_name(name);
+async fn fetch_full_data(client: &reqwest::Client, name_or_id: &str) -> Result<Option<PokemonData>, Error> {
+    let normalized = utils::pokemon::normalize_pokemon_name(name_or_id);
     let Some(pokemon) = fetch_pokemon(client, &normalized).await? else {
         return Ok(None);
     };
 
-    let species = fetch_species(client, pokemon.id).await;
-    Ok(Some(PokemonData { pokemon, species }))
+    let species = fetch_species(client, &pokemon.species.url).await;
+
+    let available_forms = species
+        .as_ref()
+        .map(|s| {
+            s.varieties
+                .iter()
+                .map(|v| FormOption {
+                    name: v.pokemon.name.clone(),
+                    label: utils::pokemon::format_form_label(&v.pokemon.name)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    Ok(Some(PokemonData { pokemon, species, available_forms }))
 }
 
 async fn fetch_evolution_chain(client: &reqwest::Client, url: &str) -> Vec<String> {
@@ -140,27 +158,53 @@ fn get_best_image_url(pokemon: &Pokemon, show_shiny: bool) -> String {
     }
 }
 
-fn build_components(evo_stages: &[String], current_name: &str, is_shiny: bool, disabled: bool, timeout_expired: bool) -> Vec<serenity::CreateActionRow> {
+fn build_components(
+    evo_stages: &[String],
+    forms: &[FormOption],
+    current_pokemon_name: &str,
+    species_name: &str,
+    is_shiny: bool,
+    disabled: bool,
+    timeout_expired: bool
+) -> Vec<serenity::CreateActionRow> {
     let mut rows = Vec::new();
 
-    if evo_stages.len() > 1 && !timeout_expired {
-        let options = evo_stages
-            .iter()
-            .map(|stage| {
-                let is_selected = stage.eq_ignore_ascii_case(current_name);
-                serenity::CreateSelectMenuOption::new(utils::uppercase_first(stage), stage).default_selection(is_selected)
-            })
-            .collect();
+    if !timeout_expired {
+        if evo_stages.len() > 1 {
+            let options = evo_stages
+                .iter()
+                .map(|stage| {
+                    let is_selected = stage.eq_ignore_ascii_case(species_name);
+                    serenity::CreateSelectMenuOption::new(utils::uppercase_first(stage), stage).default_selection(is_selected)
+                })
+                .collect();
 
-        let select_menu = serenity::CreateSelectMenu::new("select_evolution", serenity::CreateSelectMenuKind::String { options })
-            .placeholder("Navigate Evolution Line...")
-            .disabled(disabled);
+            let select_menu = serenity::CreateSelectMenu::new("select_evolution", serenity::CreateSelectMenuKind::String { options })
+                .placeholder("Navigate Evolution Line...")
+                .disabled(disabled);
 
-        rows.push(serenity::CreateActionRow::SelectMenu(select_menu));
+            rows.push(serenity::CreateActionRow::SelectMenu(select_menu));
+        }
+
+        if forms.len() > 1 {
+            let options = forms
+                .iter()
+                .map(|form| {
+                    let is_selected = form.name.eq_ignore_ascii_case(current_pokemon_name);
+                    serenity::CreateSelectMenuOption::new(&form.label, &form.name).default_selection(is_selected)
+                })
+                .collect();
+
+            let form_menu = serenity::CreateSelectMenu::new("select_form", serenity::CreateSelectMenuKind::String { options })
+                .placeholder("Select Form / Mega / Regional...")
+                .disabled(disabled);
+
+            rows.push(serenity::CreateActionRow::SelectMenu(form_menu));
+        }
     }
 
-    let smogon_url = format!("https://www.smogon.com/dex/sv/pokemon/{}/", current_name.to_lowercase());
-    let bulbapedia_url = format!("https://bulbapedia.bulbagarden.net/wiki/{}_(Pokémon)", utils::uppercase_first(current_name));
+    let smogon_url = format!("https://www.smogon.com/dex/sv/pokemon/{}/", current_pokemon_name.to_lowercase());
+    let bulbapedia_url = format!("https://bulbapedia.bulbagarden.net/wiki/{}_(Pokémon)", utils::uppercase_first(species_name));
 
     let mut buttons = Vec::new();
 
@@ -235,6 +279,8 @@ async fn build_pokemon_reply(
 
     let ev_yield_str = if ev_yields.is_empty() { "None".to_string() } else { ev_yields.join(", ") };
 
+    let species_name = species.as_ref().map(|s| s.name.as_str()).unwrap_or(pokemon.name.as_str());
+
     let evo_summary = if evo_stages.is_empty() {
         "N/A".to_string()
     } else {
@@ -242,7 +288,7 @@ async fn build_pokemon_reply(
             .iter()
             .map(|n| {
                 let formatted = utils::uppercase_first(n);
-                if n.eq_ignore_ascii_case(&pokemon.name) { format!("**{formatted}**") } else { formatted }
+                if n.eq_ignore_ascii_case(species_name) { format!("**{formatted}**") } else { formatted }
             })
             .collect::<Vec<_>>()
             .join(" ➔ ")
@@ -279,9 +325,10 @@ async fn build_pokemon_reply(
     });
 
     let image_url = get_best_image_url(pokemon, is_shiny);
+    let title_name = utils::pokemon::format_form_label(&pokemon.name);
 
     let mut embed = serenity::CreateEmbed::new()
-        .title(format!("#{:03} {}{}", pokemon.id, utils::uppercase_first(&pokemon.name), badge_str))
+        .title(format!("#{:03} {}{}", pokemon.id, title_name, badge_str))
         .field("Type", types_str, true)
         .field("Height", utils::pokemon::format_height(pokemon.height), true)
         .field("Weight", utils::pokemon::format_weight(pokemon.weight), true)
@@ -303,12 +350,12 @@ async fn build_pokemon_reply(
         embed = embed.description(format!("*\"{desc}\"*"));
     }
 
-    let components = build_components(evo_stages, &pokemon.name, is_shiny, components_disabled, false);
+    let components = build_components(evo_stages, &data.available_forms, &pokemon.name, species_name, is_shiny, components_disabled, false);
 
     Ok((embed, components))
 }
 
-/// Fetch detailed information about a Pokémon.
+/// Fetch detailed information about a Pokémon with form support.
 #[poise::command(slash_command)]
 pub async fn info(context: Context<'_>, #[description = "Name or ID of the Pokémon"] name: String) -> Result<(), Error> {
     context.defer().await?;
@@ -322,7 +369,7 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
         return Ok(());
     };
 
-    let session_evo_stages = match &session_data.species {
+    let mut session_evo_stages = match &session_data.species {
         Some(sp) => fetch_evolution_chain(client, &sp.evolution_chain.url).await,
         None => Vec::new()
     };
@@ -341,7 +388,17 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
         .stream();
 
     while let Some(interaction) = collector.next().await {
-        let loading_components = build_components(&session_evo_stages, &session_data.pokemon.name, session_shiny, true, false);
+        let species_name = session_data.species.as_ref().map(|s| s.name.as_str()).unwrap_or(session_data.pokemon.name.as_str());
+
+        let loading_components = build_components(
+            &session_evo_stages,
+            &session_data.available_forms,
+            &session_data.pokemon.name,
+            species_name,
+            session_shiny,
+            true,
+            false
+        );
 
         interaction
             .create_response(
@@ -373,6 +430,31 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
                     && let Some(new_data) = fetch_full_data(client, selected_name).await?
                 {
                     session_data = new_data;
+                    session_evo_stages = match &session_data.species {
+                        Some(sp) => fetch_evolution_chain(client, &sp.evolution_chain.url).await,
+                        None => Vec::new()
+                    };
+
+                    let (new_embed, new_components) = build_pokemon_reply(client, &session_data, &session_evo_stages, session_shiny, false).await?;
+
+                    current_embed = new_embed;
+                    current_components = new_components;
+
+                    handle
+                        .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
+                        .await?;
+                }
+            }
+            "select_form" => {
+                let selected_value = match &interaction.data.kind {
+                    serenity::ComponentInteractionDataKind::StringSelect { values } => values.first(),
+                    _ => None
+                };
+
+                if let Some(selected_form_name) = selected_value
+                    && let Some(new_data) = fetch_full_data(client, selected_form_name).await?
+                {
+                    session_data = new_data;
 
                     let (new_embed, new_components) = build_pokemon_reply(client, &session_data, &session_evo_stages, session_shiny, false).await?;
 
@@ -388,13 +470,180 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
         }
     }
 
-    let timeout_components = build_components(&session_evo_stages, &session_data.pokemon.name, session_shiny, false, true);
+    let species_name = session_data.species.as_ref().map(|s| s.name.as_str()).unwrap_or(session_data.pokemon.name.as_str());
+    let timeout_components = build_components(
+        &session_evo_stages,
+        &session_data.available_forms,
+        &session_data.pokemon.name,
+        species_name,
+        session_shiny,
+        false,
+        true
+    );
+
     let _ = handle.edit(context, poise::CreateReply::default().embed(current_embed).components(timeout_components)).await;
 
     Ok(())
 }
 
-#[poise::command(slash_command, install_context = "User", interaction_context = "Guild|BotDm|PrivateChannel", subcommands("info"))]
+fn parse_evolution_details(details: &[EvolutionDetail]) -> String {
+    if details.is_empty() {
+        return "Special condition".to_string();
+    }
+
+    let mut conditions = Vec::new();
+    for detail in details {
+        match detail.trigger.name.as_str() {
+            "level-up" => {
+                if let Some(level) = detail.min_level {
+                    conditions.push(format!("Level {level}"));
+                }
+                if let Some(item) = &detail.item {
+                    conditions.push(format!("Use {}", utils::clean_name(&item.name)));
+                }
+                if let Some(held) = &detail.held_item {
+                    conditions.push(format!("Hold {}", utils::clean_name(&held.name)));
+                }
+                if let Some(happiness) = detail.min_happiness {
+                    conditions.push(format!("Friendship ≥ {happiness}"));
+                }
+                if let Some(move_req) = &detail.known_move {
+                    conditions.push(format!("Knows {}", utils::clean_name(&move_req.name)));
+                }
+                if let Some(move_type) = &detail.known_move_type {
+                    conditions.push(format!("Knows {} move", utils::clean_name(&move_type.name)));
+                }
+                if let Some(tod) = &detail.time_of_day
+                    && !tod.is_empty()
+                {
+                    conditions.push(format!("during {}", utils::uppercase_first(tod)));
+                }
+                if let Some(loc) = &detail.location {
+                    conditions.push(format!("at {}", utils::clean_name(&loc.name)));
+                }
+                if detail.needs_overworld_rain.unwrap_or(false) {
+                    conditions.push("during Rain".to_string());
+                }
+                if let Some(gender) = detail.gender {
+                    let g_str = if gender == 1 { "Female" } else { "Male" };
+                    conditions.push(format!("({g_str})"));
+                }
+                if detail.turn_upside_down.unwrap_or(false) {
+                    conditions.push("Turn upside down".to_string());
+                }
+                if let Some(stats) = detail.relative_physical_stats {
+                    let stat_cond = match stats {
+                        1 => "Atk > Def",
+                        -1 => "Atk < Def",
+                        _ => "Atk = Def"
+                    };
+                    conditions.push(stat_cond.to_string());
+                }
+                if conditions.is_empty() {
+                    conditions.push("Level Up".to_string());
+                }
+            }
+            "use-item" => {
+                if let Some(item) = &detail.item {
+                    conditions.push(format!("Use {}", utils::clean_name(&item.name)));
+                } else {
+                    conditions.push("Use Item".to_string());
+                }
+                if let Some(gender) = detail.gender {
+                    let g_str = if gender == 1 { "Female" } else { "Male" };
+                    conditions.push(format!("({g_str})"));
+                }
+            }
+            "trade" => {
+                if let Some(held) = &detail.held_item {
+                    conditions.push(format!("Trade holding {}", utils::clean_name(&held.name)));
+                } else {
+                    conditions.push("Trade".to_string());
+                }
+            }
+            "shed" => {
+                conditions.push("Level 20 with empty party slot & Pokeball".to_string());
+            }
+            other => {
+                conditions.push(utils::clean_name(other));
+            }
+        }
+    }
+
+    if conditions.is_empty() { "Base Form".to_string() } else { conditions.join(" + ") }
+}
+
+/// Recursively traverses the chain link to populate field lists for the embed.
+fn populate_embed_fields(link: &ChainLink, embed: serenity::CreateEmbed) -> serenity::CreateEmbed {
+    let base_name = utils::clean_name(&link.species.name);
+    if link.evolves_to.is_empty() {
+        return embed.field("Evolution Status", format!("**{base_name}** does not evolve."), false);
+    }
+
+    let mut updated_embed = embed.field("🌱 Base Stage", format!("**{base_name}**"), false);
+
+    let is_multi_branch = link.evolves_to.len() > 1;
+    let mut stage1_text = String::new();
+
+    for child in &link.evolves_to {
+        let target_name = utils::clean_name(&child.species.name);
+        let condition = parse_evolution_details(&child.evolution_details);
+
+        stage1_text.push_str(&format!("➔ **{target_name}** — *{condition}*\n"));
+    }
+
+    let stage1_header = if is_multi_branch { "🌿 Branch Evolutions" } else { "🌿 Stage 1" };
+
+    updated_embed = updated_embed.field(stage1_header, stage1_text, false);
+
+    let mut stage2_text = String::new();
+    for child in &link.evolves_to {
+        for grand_child in &child.evolves_to {
+            let from_name = utils::clean_name(&child.species.name);
+            let target_name = utils::clean_name(&grand_child.species.name);
+            let condition = parse_evolution_details(&grand_child.evolution_details);
+
+            stage2_text.push_str(&format!("➔ **{target_name}** *(from {from_name})* — *{condition}*\n"));
+        }
+    }
+
+    if !stage2_text.is_empty() {
+        updated_embed = updated_embed.field("🌳 Stage 2", stage2_text, false);
+    }
+
+    updated_embed
+}
+
+/// View detailed evolution requirements and conditions for a Pokémon.
+#[poise::command(slash_command)]
+pub async fn evolution(context: Context<'_>, #[description = "Name or ID of the Pokémon"] name: String) -> Result<(), Error> {
+    context.defer().await?;
+
+    let client = &context.data().reqwest_client;
+    let normalized = name.trim().to_lowercase().replace(' ', "-");
+    let species_url = format!("https://pokeapi.co/api/v2/pokemon-species/{normalized}/");
+    let species_res = client.get(&species_url).send().await?;
+    if species_res.status() == reqwest::StatusCode::NOT_FOUND {
+        context.say(format!("Could not find species data for: **{name}**")).await?;
+        return Ok(());
+    }
+
+    let species: PokemonSpecies = species_res.error_for_status()?.json().await?;
+    let chain_res = client.get(&species.evolution_chain.url).send().await?;
+    let chain_data: EvolutionChainResponse = chain_res.error_for_status()?.json().await?;
+    let title_name = utils::clean_name(&species.name);
+    let mut embed = serenity::CreateEmbed::new()
+        .title(format!("🧬 Evolution Line: {title_name}"))
+        .color(0x3B4CCA)
+        .footer(serenity::CreateEmbedFooter::new("Data sourced from PokéAPI"));
+
+    embed = populate_embed_fields(&chain_data.chain, embed);
+    context.send(poise::CreateReply::default().embed(embed)).await?;
+
+    Ok(())
+}
+
+#[poise::command(slash_command, install_context = "User", interaction_context = "Guild|BotDm|PrivateChannel", subcommands("info", "evolution"))]
 pub async fn pokemon(_: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
