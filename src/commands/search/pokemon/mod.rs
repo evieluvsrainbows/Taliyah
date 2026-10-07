@@ -1,6 +1,12 @@
 use futures::future::join_all;
+use poise::CreateReply;
 use poise::futures_util::StreamExt;
-use poise::serenity_prelude as serenity;
+use serenity::builder::{
+    CreateActionRow, CreateButton, CreateEmbed, CreateEmbedFooter, CreateInteractionResponse, CreateInteractionResponseMessage, CreateSelectMenu, CreateSelectMenuKind,
+    CreateSelectMenuOption
+};
+use serenity::collector::ComponentInteractionCollector;
+use serenity::model::application::{ButtonStyle, ComponentInteractionDataKind};
 
 use std::collections::HashMap;
 use std::time::Duration;
@@ -166,7 +172,7 @@ fn build_components(
     is_shiny: bool,
     disabled: bool,
     timeout_expired: bool
-) -> Vec<serenity::CreateActionRow> {
+) -> Vec<CreateActionRow> {
     let mut rows = Vec::new();
 
     if !timeout_expired {
@@ -175,15 +181,15 @@ fn build_components(
                 .iter()
                 .map(|stage| {
                     let is_selected = stage.eq_ignore_ascii_case(species_name);
-                    serenity::CreateSelectMenuOption::new(utils::uppercase_first(stage), stage).default_selection(is_selected)
+                    CreateSelectMenuOption::new(utils::uppercase_first(stage), stage).default_selection(is_selected)
                 })
                 .collect();
 
-            let select_menu = serenity::CreateSelectMenu::new("select_evolution", serenity::CreateSelectMenuKind::String { options })
+            let select_menu = CreateSelectMenu::new("select_evolution", CreateSelectMenuKind::String { options })
                 .placeholder("Navigate Evolution Line...")
                 .disabled(disabled);
 
-            rows.push(serenity::CreateActionRow::SelectMenu(select_menu));
+            rows.push(CreateActionRow::SelectMenu(select_menu));
         }
 
         if forms.len() > 1 {
@@ -191,15 +197,15 @@ fn build_components(
                 .iter()
                 .map(|form| {
                     let is_selected = form.name.eq_ignore_ascii_case(current_pokemon_name);
-                    serenity::CreateSelectMenuOption::new(&form.label, &form.name).default_selection(is_selected)
+                    CreateSelectMenuOption::new(&form.label, &form.name).default_selection(is_selected)
                 })
                 .collect();
 
-            let form_menu = serenity::CreateSelectMenu::new("select_form", serenity::CreateSelectMenuKind::String { options })
+            let form_menu = CreateSelectMenu::new("select_form", CreateSelectMenuKind::String { options })
                 .placeholder("Select Form / Mega / Regional...")
                 .disabled(disabled);
 
-            rows.push(serenity::CreateActionRow::SelectMenu(form_menu));
+            rows.push(CreateActionRow::SelectMenu(form_menu));
         }
     }
 
@@ -210,15 +216,15 @@ fn build_components(
 
     if !timeout_expired {
         let toggle_label = if is_shiny { "✨ Standard" } else { "✨ Shiny" };
-        let toggle_style = if is_shiny { serenity::ButtonStyle::Success } else { serenity::ButtonStyle::Secondary };
+        let toggle_style = if is_shiny { ButtonStyle::Success } else { ButtonStyle::Secondary };
 
-        buttons.push(serenity::CreateButton::new("toggle_shiny").label(toggle_label).style(toggle_style).disabled(disabled));
+        buttons.push(CreateButton::new("toggle_shiny").label(toggle_label).style(toggle_style).disabled(disabled));
     }
 
-    buttons.push(serenity::CreateButton::new_link(smogon_url).label("Smogon"));
-    buttons.push(serenity::CreateButton::new_link(bulbapedia_url).label("Bulbapedia"));
+    buttons.push(CreateButton::new_link(smogon_url).label("Smogon"));
+    buttons.push(CreateButton::new_link(bulbapedia_url).label("Bulbapedia"));
 
-    rows.push(serenity::CreateActionRow::Buttons(buttons));
+    rows.push(CreateActionRow::Buttons(buttons));
     rows
 }
 
@@ -228,7 +234,7 @@ async fn build_pokemon_reply(
     evo_stages: &[String],
     is_shiny: bool,
     components_disabled: bool
-) -> Result<(serenity::CreateEmbed, Vec<serenity::CreateActionRow>), Error> {
+) -> Result<(CreateEmbed, Vec<CreateActionRow>), Error> {
     let pokemon = &data.pokemon;
     let species = &data.species;
 
@@ -327,7 +333,7 @@ async fn build_pokemon_reply(
     let image_url = get_best_image_url(pokemon, is_shiny);
     let title_name = utils::pokemon::format_form_label(&pokemon.name);
 
-    let mut embed = serenity::CreateEmbed::new()
+    let mut embed = CreateEmbed::new()
         .title(format!("#{:03} {}{}", pokemon.id, title_name, badge_str))
         .field("Type", types_str, true)
         .field("Height", utils::pokemon::format_height(pokemon.height), true)
@@ -376,12 +382,10 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
 
     let (mut current_embed, mut current_components) = build_pokemon_reply(client, &session_data, &session_evo_stages, session_shiny, false).await?;
 
-    let handle = context
-        .send(poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
-        .await?;
+    let handle = context.send(CreateReply::default().embed(current_embed.clone()).components(current_components.clone())).await?;
     let message = handle.message().await?;
 
-    let mut collector = serenity::ComponentInteractionCollector::new(context.serenity_context())
+    let mut collector = ComponentInteractionCollector::new(context.serenity_context())
         .author_id(context.author().id)
         .message_id(message.id)
         .timeout(Duration::from_secs(120))
@@ -403,7 +407,7 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
         interaction
             .create_response(
                 context.serenity_context(),
-                serenity::CreateInteractionResponse::UpdateMessage(serenity::CreateInteractionResponseMessage::new().embed(current_embed.clone()).components(loading_components))
+                CreateInteractionResponse::UpdateMessage(CreateInteractionResponseMessage::new().embed(current_embed.clone()).components(loading_components))
             )
             .await?;
 
@@ -417,12 +421,12 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
                 current_components = new_components;
 
                 handle
-                    .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
+                    .edit(context, CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
                     .await?;
             }
             "select_evolution" => {
                 let selected_value = match &interaction.data.kind {
-                    serenity::ComponentInteractionDataKind::StringSelect { values } => values.first(),
+                    ComponentInteractionDataKind::StringSelect { values } => values.first(),
                     _ => None
                 };
 
@@ -441,13 +445,13 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
                     current_components = new_components;
 
                     handle
-                        .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
+                        .edit(context, CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
                         .await?;
                 }
             }
             "select_form" => {
                 let selected_value = match &interaction.data.kind {
-                    serenity::ComponentInteractionDataKind::StringSelect { values } => values.first(),
+                    ComponentInteractionDataKind::StringSelect { values } => values.first(),
                     _ => None
                 };
 
@@ -462,7 +466,7 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
                     current_components = new_components;
 
                     handle
-                        .edit(context, poise::CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
+                        .edit(context, CreateReply::default().embed(current_embed.clone()).components(current_components.clone()))
                         .await?;
                 }
             }
@@ -481,7 +485,7 @@ pub async fn info(context: Context<'_>, #[description = "Name or ID of the Poké
         true
     );
 
-    let _ = handle.edit(context, poise::CreateReply::default().embed(current_embed).components(timeout_components)).await;
+    let _ = handle.edit(context, CreateReply::default().embed(current_embed).components(timeout_components)).await;
 
     Ok(())
 }
@@ -574,7 +578,7 @@ fn parse_evolution_details(details: &[EvolutionDetail]) -> String {
 }
 
 /// Recursively traverses the chain link to populate field lists for the embed.
-fn populate_embed_fields(link: &ChainLink, embed: serenity::CreateEmbed) -> serenity::CreateEmbed {
+fn populate_embed_fields(link: &ChainLink, embed: CreateEmbed) -> CreateEmbed {
     let base_name = utils::clean_name(&link.species.name);
     if link.evolves_to.is_empty() {
         return embed.field("Evolution Status", format!("**{base_name}** does not evolve."), false);
@@ -632,13 +636,13 @@ pub async fn evolution(context: Context<'_>, #[description = "Name or ID of the 
     let chain_res = client.get(&species.evolution_chain.url).send().await?;
     let chain_data: EvolutionChainResponse = chain_res.error_for_status()?.json().await?;
     let title_name = utils::clean_name(&species.name);
-    let mut embed = serenity::CreateEmbed::new()
+    let mut embed = CreateEmbed::new()
         .title(format!("🧬 Evolution Line: {title_name}"))
         .color(0x3B4CCA)
-        .footer(serenity::CreateEmbedFooter::new("Data sourced from PokéAPI"));
+        .footer(CreateEmbedFooter::new("Data sourced from PokéAPI"));
 
     embed = populate_embed_fields(&chain_data.chain, embed);
-    context.send(poise::CreateReply::default().embed(embed)).await?;
+    context.send(CreateReply::default().embed(embed)).await?;
 
     Ok(())
 }

@@ -1,7 +1,7 @@
 use serenity::model::gateway::{Activity, ActivityType};
 
-/// Formats raw Spotify artist lists ("Artist A; Artist B") cleanly with commas and ampersands.
-pub fn format_spotify_artists(raw_artists: &str) -> String {
+/// Formats raw artist lists ("Artist A; Artist B") cleanly with commas and ampersands.
+pub fn format_artist_string(raw_artists: &str) -> String {
     let artists: Vec<&str> = raw_artists.split(';').map(str::trim).collect();
     match artists.as_slice() {
         [] => String::new(),
@@ -22,12 +22,28 @@ pub fn parse_activity(activity: &Activity) -> (Option<String>, Option<String>) {
 
     let mut track_art = None;
     let name = activity.name.as_str();
+    let app_id = activity.application_id;
 
     let text = match activity.kind {
+        ActivityType::Listening if app_id.is_some() && app_id.unwrap() == 1247654840780460125 => {
+            if let (Some(song), Some(artists), Some(assets)) = (activity.details.as_ref(), activity.state.as_deref(), activity.assets.as_ref()) {
+                let image = assets.large_image.as_deref().unwrap();
+                let album = assets.large_text.as_deref().unwrap_or("an album");
+                let artist_formatted = format_artist_string(artists);
+                if let Some((_, path)) = image.split_once("https/") {
+                    let url = format!("https://{path}");
+                    track_art = Some(url);
+                };
+
+                format!("listening to **{song}** on **{album}** by **{artist_formatted}** on **{name}**")
+            } else {
+                format!("listening to **{name}**")
+            }
+        }
         ActivityType::Listening if name == "Spotify" => {
             if let (Some(song), Some(artists), Some(assets), Some(uri)) = (activity.details.as_deref(), activity.state.as_deref(), activity.assets.as_ref(), activity.sync_id.as_deref()) {
                 let album = assets.large_text.as_deref().unwrap_or("an album");
-                let artist_formatted = format_spotify_artists(artists);
+                let artist_formatted = format_artist_string(artists);
                 let url = format!("https://open.spotify.com/track/{uri}");
 
                 if let Some(art) = assets.large_image.as_deref() {
